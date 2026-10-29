@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✏️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Playwrite+US+Trad:wght@400&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -160,6 +160,10 @@ textarea.text.en{font-family:Andika,system-ui,sans-serif}
 .ai-box summary{min-height:48px;display:flex;align-items:center;cursor:pointer;font-weight:700}
 .ai-in{display:flex;flex-direction:column;gap:10px;padding-bottom:14px}
 
+.mine-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mine-bar[hidden]{display:none}
+.lv.new .code{background:var(--accent);color:var(--accent-ink)}
+
 /* ---- site nav ---- */
 .site{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
@@ -304,6 +308,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <input class="text" id="title" type="text" maxlength="30" placeholder="제목">
       <textarea class="text" id="story" placeholder="위에서 이야기를 고르거나, 여기에 직접 써 넣으세요."></textarea>
       <p class="hint" id="k-countHint"></p>
+      <div class="mine-bar" id="k-mine" hidden>
+        <button class="secondary" id="k-save" type="button">이 기기에 저장</button>
+        <button class="secondary" id="k-del" type="button" hidden>삭제</button>
+        <span class="hint">저장한 글은 이 브라우저에만 남아요.</span>
+      </div>
     </div>
     <details class="ai-box">
       <summary>AI로 새 이야기 만들기 (선택)</summary>
@@ -351,6 +360,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <div class="levels" id="e-list"></div>
     </fieldset>
     <fieldset>
+      <legend>Letter style</legend>
+      <div class="seg" role="group" aria-label="Letter style">
+        <button type="button" data-estyle="print" aria-pressed="true">Print</button>
+        <button type="button" data-estyle="cursive" aria-pressed="false">Cursive</button>
+      </div>
+    </fieldset>
+    <fieldset>
       <legend>Line size</legend>
       <div class="seg" role="group" aria-label="Line size">
         <button type="button" data-esize="L" aria-pressed="true">Large (K)</button>
@@ -380,6 +396,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <input class="text" id="e-title" type="text" maxlength="40" placeholder="Title">
       <textarea class="text en" id="e-text" placeholder="Pick a story above or type here. Each line starts a new model line."></textarea>
       <p class="hint" id="e-countHint"></p>
+      <div class="mine-bar" id="e-mine" hidden>
+        <button class="secondary" id="e-save" type="button">Save on this device</button>
+        <button class="secondary" id="e-del" type="button" hidden>Delete</button>
+        <span class="hint">Saved texts stay in this browser only.</span>
+      </div>
     </div>
   </section>
 
@@ -410,6 +431,17 @@ const DL={save:async({filename,data})=>{
   a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(u),5000);
 }};
+/* shared: saved texts in this browser */
+function MyStore(key){
+  const read=()=>{try{const v=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(v)?v:[];}catch(e){return [];}};
+  const write=a=>{try{localStorage.setItem(key,JSON.stringify(a));return true;}catch(e){return false;}};
+  return {
+    list:()=>read().sort((a,b)=>b.updated-a.updated),
+    get:id=>read().find(x=>x.id===id)||null,
+    save:item=>{const a=read().filter(x=>x.id!==item.id);item.updated=Date.now();a.push(item);return write(a);},
+    remove:id=>write(read().filter(x=>x.id!==id))
+  };
+}
 /* tabs (hash routing) */
 (function(){
   function show(){
@@ -815,23 +847,43 @@ function renderTpl(tpl){
     return call+p;
   });
 }
+const store=MyStore('kmom.ko.custom');
+const KO_PH='예) 오늘은 할머니 댁에 갔어요.\n할머니가 맛있는 떡을 주셨어요.\n나는 할머니께 고맙다고 말했어요.\n\n오늘 있었던 일, 가족 이야기, 고마운 사람에게 쓰는 편지처럼 아이 이야기를 써 보세요. 한 줄에 한 문장씩 쓰면 돼요.';
+const isMine=()=>state.storyId==='new'||state.storyId.startsWith('my-');
+function showMine(){
+  $('k-mine').hidden=!(isMine()||state.dirty);
+  $('k-del').hidden=!state.storyId.startsWith('my-');
+  $('k-save').textContent=state.storyId.startsWith('my-')?'저장한 글 업데이트':'이 기기에 저장';
+}
 function loadStory(){
+  if(state.storyId==='new'){
+    $('title').value='';$('story').value='';$('story').placeholder=KO_PH;$('title').placeholder='제목 예: 할머니 댁에 간 날';
+    state.dirty=false;showMine();build();$('title').focus();return;
+  }
+  $('story').placeholder='위에서 이야기를 고르거나, 여기에 직접 써 넣으세요.';$('title').placeholder='제목';
+  if(state.storyId.startsWith('my-')){
+    const m=store.get(state.storyId);if(!m){state.storyId=KO_STORIES[0].id;return loadStory();}
+    $('title').value=m.title;$('story').value=m.text;state.dirty=false;showMine();build();return;
+  }
   const s=KO_STORIES.find(x=>x.id===state.storyId);if(!s)return;
   $('title').value=s.title;
   $('story').value=s.lines.map(renderTpl).join('\n');
-  state.dirty=false;build();
+  state.dirty=false;showMine();build();
 }
 
 /* ---- story list ---- */
+function listBtn(id,code,name,ex,cls){
+  const b=document.createElement('button');b.type='button';b.className='lv'+(cls?' '+cls:'');
+  b.setAttribute('aria-pressed',id===state.storyId?'true':'false');
+  b.innerHTML='<span class="code">'+code+'</span><span class="name">'+esc(name)+'</span><span class="ex">'+esc(ex)+'</span>';
+  b.addEventListener('click',()=>{state.storyId=id;state.cur=0;renderList();loadStory();});
+  return b;
+}
 function renderList(){
   const box=$('k-list');box.innerHTML='';
-  KO_STORIES.forEach(s=>{
-    const b=document.createElement('button');b.type='button';b.className='lv';
-    b.setAttribute('aria-pressed',s.id===state.storyId?'true':'false');
-    b.innerHTML='<span class="code">'+s.grade+'학년</span><span class="name">'+s.title+'</span><span class="ex">'+s.lines.length+'문장</span>';
-    b.addEventListener('click',()=>{state.storyId=s.id;state.cur=0;renderList();loadStory();});
-    box.appendChild(b);
-  });
+  box.appendChild(listBtn('new','✏️','직접 쓰기','오늘 있었던 일, 가족 이야기를 직접 써요','new'));
+  store.list().forEach(m=>box.appendChild(listBtn(m.id,'내 글',m.title||'제목 없음',new Date(m.updated).toLocaleDateString('ko-KR')+' 저장')));
+  KO_STORIES.forEach(s=>box.appendChild(listBtn(s.id,s.grade+'학년',s.title,s.lines.length+'문장')));
 }
 
 /* ---- layout ---- */
@@ -884,7 +936,7 @@ function build(){
       '<div class="s-fields"><div class="s-field"><span>이름</span><span class="s-line"></span></div><div class="s-field"><span>날짜</span><span class="s-line"></span></div></div></div><div class="grid">'+grid+'</div></div>');
   }
   state.sheets=lines.length?sheets:[];
-  $('k-countHint').textContent=lines.length?('이 이야기는 '+lines.length+'줄, '+total+'장이에요 (한 장에 '+g.pairs+'줄).'+(state.dirty?' 직접 고친 내용이라 이름을 바꿔도 자동으로 바뀌지 않아요.':'')):'';
+  $('k-countHint').textContent=lines.length?('이 이야기는 '+lines.length+'줄, '+total+'장이에요 (한 장에 '+g.pairs+'줄).'+((state.dirty&&!isMine())?' 직접 고친 내용이라 이름을 바꿔도 자동으로 바뀌지 않아요.':'')):'';
   showPage();$('k-pdf').disabled=!lines.length;
 }
 function showPage(){
@@ -913,7 +965,19 @@ seg('data-lv','lv',Number);seg('data-cols','cols',Number);seg('data-kpaper','pap
 $('k-sentnl').addEventListener('change',build);
 let nt;$('name').addEventListener('input',()=>{clearTimeout(nt);nt=setTimeout(()=>{if(!state.dirty)loadStory();},250);});
 $('aechin').addEventListener('change',()=>{if(!state.dirty)loadStory();});
-let et;$('story').addEventListener('input',()=>{state.dirty=true;clearTimeout(et);et=setTimeout(build,250);});
+let et;$('story').addEventListener('input',()=>{state.dirty=true;showMine();clearTimeout(et);et=setTimeout(build,250);});
+$('k-save').addEventListener('click',()=>{
+  const text=$('story').value.trim();if(!text){setStatus('저장할 내용이 없어요.',true);return;}
+  const id=state.storyId.startsWith('my-')?state.storyId:'my-'+Date.now();
+  const title=$('title').value.trim()||('내 이야기 '+new Date().toLocaleDateString('ko-KR'));
+  if(!store.save({id,title,text})){setStatus('이 브라우저에서는 저장할 수 없어요.',true);return;}
+  state.storyId=id;state.dirty=false;$('title').value=title;renderList();showMine();build();setStatus('이 기기에 저장했어요. 목록 위쪽 ‘내 글’에서 다시 열 수 있어요.');
+});
+$('k-del').addEventListener('click',()=>{
+  if(!state.storyId.startsWith('my-'))return;
+  if(!confirm('이 글을 삭제할까요?'))return;
+  store.remove(state.storyId);state.storyId=KO_STORIES[0].id;state.cur=0;renderList();loadStory();setStatus('삭제했어요.');
+});
 $('title').addEventListener('input',()=>{clearTimeout(et);et=setTimeout(build,250);});
 
 function setStatus(t,err){const s=$('k-status');s.textContent=t||'';s.classList.toggle('err',!!err);}
@@ -935,7 +999,7 @@ $('make').addEventListener('click',async()=>{
     $('title').value=String(data.title||'').slice(0,30);
     $('story').value=sents.join('\n');state.dirty=true;state.cur=0;
     document.querySelectorAll('#k-list .lv').forEach(x=>x.setAttribute('aria-pressed','false'));
-    build();setStatus('AI 이야기를 만들었어요. 인쇄 전에 한 번 읽어 봐 주세요.');
+    showMine();build();setStatus('AI 이야기를 만들었어요. 인쇄 전에 한 번 읽어 봐 주세요.');
   }catch(e){
     setStatus('AI 이야기를 만들지 못했어요'+(e&&e.detail?' ('+e.detail+')':'')+'. 목록의 이야기를 쓰거나 직접 써 넣어 주세요.',true);
   }finally{btn.disabled=false;btn.textContent='AI로 만들기';}
@@ -991,25 +1055,46 @@ const EN_STORIES=[
 const $=id=>document.getElementById(id);
 const PAPER={letter:{w:816,h:1056,pdf:'letter',pw:612,ph:792},a4:{w:794,h:1123,pdf:'a4',pw:595.28,ph:841.89}};
 const SIZE={L:48,M:38,S:28};
-const FONT="Andika, 'Comic Sans MS', 'Trebuchet MS', sans-serif";
-const state={storyId:EN_STORIES[0].id,size:'L',rep:1,paper:'letter',dirty:false,pages:[],cur:0,xRatio:0.5};
+const FONTS={print:"Andika, 'Comic Sans MS', 'Trebuchet MS', sans-serif",cursive:"'Playwrite US Trad', 'Segoe Script', cursive"};
+let FONT=FONTS.print;
+const state={style:'print',storyId:EN_STORIES[0].id,size:'L',rep:1,paper:'letter',dirty:false,pages:[],cur:0,xRatio:0.5};
 const PG=()=>PAPER[state.paper];
 const mctx=document.createElement('canvas').getContext('2d');
 
 function fill(t){return t.replace(/\{name\}/g,$('e-name').value.trim()||'Sam');}
+const store=MyStore('kmom.en.custom');
+const EN_PH='e.g. Today I went to the beach.\nI found a pink shell.\nI gave it to my mom.\n\nWrite about your child’s day, a family trip, or a thank-you note. One sentence per line works well.';
+const isMine=()=>state.storyId==='new'||state.storyId.startsWith('my-');
+function showMine(){
+  $('e-mine').hidden=!(isMine()||state.dirty);
+  $('e-del').hidden=!state.storyId.startsWith('my-');
+  $('e-save').textContent=state.storyId.startsWith('my-')?'Update saved text':'Save on this device';
+}
 function loadStory(){
+  if(state.storyId==='new'){
+    $('e-title').value='';$('e-text').value='';$('e-text').placeholder=EN_PH;$('e-title').placeholder='Title, e.g. My Day at the Beach';
+    state.dirty=false;showMine();build();$('e-title').focus();return;
+  }
+  $('e-text').placeholder='Pick a story above or type here. Each line starts a new model line.';$('e-title').placeholder='Title';
+  if(state.storyId.startsWith('my-')){
+    const m=store.get(state.storyId);if(!m){state.storyId=EN_STORIES[0].id;return loadStory();}
+    $('e-title').value=m.title;$('e-text').value=m.text;state.dirty=false;showMine();build();return;
+  }
   const s=EN_STORIES.find(x=>x.id===state.storyId);if(!s)return;
-  $('e-title').value=s.title;$('e-text').value=s.lines.map(fill).join('\n');state.dirty=false;build();
+  $('e-title').value=s.title;$('e-text').value=s.lines.map(fill).join('\n');state.dirty=false;showMine();build();
+}
+function listBtn(id,code,name,ex,cls){
+  const b=document.createElement('button');b.type='button';b.className='lv'+(cls?' '+cls:'');
+  b.setAttribute('aria-pressed',id===state.storyId?'true':'false');
+  b.innerHTML='<span class="code">'+code+'</span><span class="name">'+esc(name)+'</span><span class="ex">'+esc(ex)+'</span>';
+  b.addEventListener('click',()=>{state.storyId=id;state.cur=0;renderList();loadStory();});
+  return b;
 }
 function renderList(){
   const box=$('e-list');box.innerHTML='';
-  EN_STORIES.forEach(s=>{
-    const b=document.createElement('button');b.type='button';b.className='lv';
-    b.setAttribute('aria-pressed',s.id===state.storyId?'true':'false');
-    b.innerHTML='<span class="code">K–2</span><span class="name">'+s.title+'</span><span class="ex">'+s.lines.length+' lines</span>';
-    b.addEventListener('click',()=>{state.storyId=s.id;state.cur=0;renderList();loadStory();});
-    box.appendChild(b);
-  });
+  box.appendChild(listBtn('new','✏️','Write my own','Your child’s day, a trip, a thank-you note','new'));
+  store.list().forEach(m=>box.appendChild(listBtn(m.id,'Mine',m.title||'Untitled','Saved '+new Date(m.updated).toLocaleDateString('en-US'))));
+  EN_STORIES.forEach(s=>box.appendChild(listBtn(s.id,'K–2',s.title,s.lines.length+' lines')));
 }
 
 function geom(){
@@ -1026,7 +1111,7 @@ function measureFont(){
   mctx.font='100px '+FONT;
   const m=mctx.measureText('x');
   const r=(m.actualBoundingBoxAscent||50)/100;
-  state.xRatio=(r>0.3&&r<0.7)?r:0.5;
+  state.xRatio=(r>0.2&&r<0.7)?r:0.5;
 }
 function wrap(text,maxW,fs){
   mctx.font=fs+'px '+FONT;
@@ -1047,7 +1132,7 @@ function build(){
   const per=g.groups;const total=Math.max(1,Math.ceil(lines.length/per));
   state.pages=[];
   if(lines.length)for(let p=0;p<total;p++)state.pages.push(lines.slice(p*per,(p+1)*per));
-  $('e-countHint').textContent=lines.length?(lines.length+' model lines, '+total+(total>1?' pages':' page')+' ('+per+' per page).'+(state.dirty?' Edited text: changing the name won’t update it.':'')):'';
+  $('e-countHint').textContent=lines.length?(lines.length+' model lines, '+total+(total>1?' pages':' page')+' ('+per+' per page).'+((state.dirty&&!isMine())?' Edited text: changing the name won’t update it.':'')):'';
   $('e-pdf').disabled=!lines.length;
   showPage();
 }
@@ -1103,10 +1188,29 @@ function seg(attr,key,parse){
     state.cur=0;build();
   }));
 }
-seg('data-esize','size',String);seg('data-erep','rep',Number);seg('data-epaper','paper',String);
+seg('data-esize','size',String);
+document.querySelectorAll('[data-estyle]').forEach(b=>b.addEventListener('click',()=>{
+  state.style=b.dataset.estyle;FONT=FONTS[state.style];
+  document.querySelectorAll('[data-estyle]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+  const go=()=>{measureFont();state.cur=0;build();};
+  const fam=state.style==='cursive'?'40px "Playwrite US Trad"':'40px Andika';
+  if(document.fonts&&document.fonts.load)document.fonts.load(fam).then(go,go);else go();
+}));seg('data-erep','rep',Number);seg('data-epaper','paper',String);
 $('e-trace').addEventListener('change',showPage);
 let nt;$('e-name').addEventListener('input',()=>{clearTimeout(nt);nt=setTimeout(()=>{if(!state.dirty)loadStory();},250);});
-let et;$('e-text').addEventListener('input',()=>{state.dirty=true;clearTimeout(et);et=setTimeout(build,250);});
+let et;$('e-text').addEventListener('input',()=>{state.dirty=true;showMine();clearTimeout(et);et=setTimeout(build,250);});
+$('e-save').addEventListener('click',()=>{
+  const text=$('e-text').value.trim();if(!text){setStatus('Nothing to save yet.',true);return;}
+  const id=state.storyId.startsWith('my-')?state.storyId:'my-'+Date.now();
+  const title=$('e-title').value.trim()||('My text '+new Date().toLocaleDateString('en-US'));
+  if(!store.save({id,title,text})){setStatus('This browser can’t save texts.',true);return;}
+  state.storyId=id;state.dirty=false;$('e-title').value=title;renderList();showMine();build();setStatus('Saved on this device. Find it under “Mine” at the top of the list.');
+});
+$('e-del').addEventListener('click',()=>{
+  if(!state.storyId.startsWith('my-'))return;
+  if(!confirm('Delete this text?'))return;
+  store.remove(state.storyId);state.storyId=EN_STORIES[0].id;state.cur=0;renderList();loadStory();setStatus('Deleted.');
+});
 $('e-title').addEventListener('input',()=>{clearTimeout(et);et=setTimeout(showPage,250);});
 
 function setStatus(t,err){const s=$('e-status');s.textContent=t||'';s.classList.toggle('err',!!err);}
