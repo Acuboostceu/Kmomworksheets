@@ -40,3 +40,25 @@ const EN_STORIES=[
 {id:'e-06',title:'The Fox and the Stork',lines:[
 'The fox asked the stork to lunch.','He gave her soup in a flat dish.','The stork could not eat it.','Then the stork asked the fox to lunch.','She gave him food in a tall jar.','The fox could not eat it.','The fox said sorry.','Now they share food that both can eat.','{name} thinks about what friends like.']}
 ];
+
+/* 독해 문제 — 이야기 id별. o: 보기(3개), a: 정답 번호(0부터), w: 직접 쓰는 문제 */
+const KO_QUIZ={
+'k1-01':[{t:'토끼와 거북이는 무엇을 했나요?',o:['달리기 시합','숨바꼭질','수영 시합'],a:0},{t:'토끼는 시합 중에 무엇을 했나요?',o:['물을 마셨어요','나무 밑에서 잠을 잤어요','거북이를 업어 주었어요'],a:1},{t:'누가 먼저 도착했나요?',o:['토끼','다람쥐','거북이'],a:2},{t:'거북이가 이길 수 있었던 까닭은 무엇일까요?',w:1}],
+'k1-02':[{t:'해님과 바람은 무엇을 했나요?',o:['내기','달리기','노래 부르기'],a:0},{t:'바람이 세게 불자 나그네는 어떻게 했나요?',o:['외투를 벗었어요','외투를 꼭 잡았어요','집으로 갔어요'],a:1},{t:'나그네의 외투를 벗긴 것은 누구인가요?',o:['바람','구름','해님'],a:2},{t:'해님이 이길 수 있었던 까닭을 써 보세요.',w:1}],
+'k1-03':[{t:'여름에 개미는 무엇을 했나요?',o:['먹이를 날랐어요','노래만 불렀어요','낮잠을 잤어요'],a:0},{t:'겨울이 되자 베짱이는 어떻게 되었나요?',o:['신나게 놀았어요','춥고 배가 고팠어요','개미를 도와주었어요'],a:1},{t:'개미는 베짱이에게 무엇을 나누어 주었나요?',o:['차가운 물','노래','따뜻한 수프'],a:2},{t:'나라면 베짱이에게 무슨 말을 해 주고 싶나요?',w:1}],
+'k1-04':[{t:'나무꾼의 도끼는 어디에 빠졌나요?',o:['강','연못','우물'],a:1},{t:'나무꾼의 진짜 도끼는 무엇인가요?',o:['금도끼','은도끼','쇠도끼'],a:2},{t:'산신령은 나무꾼에게 무엇을 주었나요?',o:['도끼를 모두 주었어요','아무것도 주지 않았어요','금도끼만 주었어요'],a:0},{t:'산신령이 나무꾼에게 도끼를 모두 준 까닭은 무엇일까요?',w:1}],
+'k1-05':[{t:'생쥐는 어디를 지나갔나요?',o:['사자 꼬리','사자 코 위','사자 등'],a:1},{t:'사자가 그물에 걸렸을 때 누가 도와주었나요?',o:['생쥐','토끼','새'],a:0},{t:'생쥐는 어떻게 사자를 구했나요?',o:['친구를 불렀어요','그물을 들어 올렸어요','그물을 갉았어요'],a:2},{t:'작은 친구가 큰 도움을 준 일이 있나요? 써 보세요.',w:1}],
+'k1-06':[{t:'시골 쥐는 누구네 집에 갔나요?',o:['고양이네 집','도시 쥐네 집','할머니 댁'],a:1},{t:'둘이 음식을 먹으려는데 처음에 누가 왔나요?',o:['고양이','강아지','토끼'],a:0},{t:'시골 쥐는 어디가 좋다고 했나요?',o:['큰 성','시끄러운 도시','조용한 시골'],a:2},{t:'우리 집에서 가장 편한 곳은 어디인가요?',w:1}],
+'k1-07':[{t:'여우는 수프를 어디에 담아 주었나요?',o:['넓은 접시','목이 긴 병','작은 컵'],a:0},{t:'두루미가 수프를 먹지 못한 까닭은 무엇인가요?',o:['배가 불러서','부리가 길어서','수프가 뜨거워서'],a:1},{t:'다음 날 두루미는 음식을 어디에 담아 주었나요?',o:['넓은 접시','바구니','목이 긴 병'],a:2},{t:'친구를 초대한다면 무엇을 준비하고 싶나요?',w:1}],
+'k1-08':[{t:'까마귀가 물을 마시지 못한 까닭은 무엇인가요?',o:['부리가 물에 닿지 않아서','물이 너무 차가워서','병이 깨져서'],a:0},{t:'까마귀는 병에 무엇을 넣었나요?',o:['나뭇잎','작은 돌','모래'],a:1},{t:'돌을 넣자 물은 어떻게 되었나요?',o:['모두 쏟아졌어요','얼음이 되었어요','조금씩 올라왔어요'],a:2},{t:'어려운 일이 있을 때 나는 어떻게 하나요?',w:1}],
+'k1-09':[{t:'직녀는 무엇을 잘했나요?',o:['옷감 짜기','노래 부르기','소 몰기'],a:0},{t:'견우와 직녀는 왜 멀리 떨어지게 되었나요?',o:['서로 싸워서','일을 하지 않아서','길을 잃어서'],a:1},{t:'견우와 직녀를 만나게 해 준 것은 누구인가요?',o:['해님과 바람','까치와 까마귀','토끼와 거북이'],a:1},{t:'견우와 직녀에게 하고 싶은 말을 써 보세요.',w:1}],
+'k1-10':[{t:'흥부는 다친 제비에게 무엇을 해 주었나요?',o:['노래를 불러 주었어요','집을 지어 주었어요','다리를 감아 주었어요'],a:2},{t:'봄에 돌아온 제비는 무엇을 떨어뜨렸나요?',o:['깃털','박씨','돌멩이'],a:1},{t:'박을 타니 무엇이 나왔나요?',o:['쌀과 보물','물과 모래','나뭇잎'],a:0},{t:'다친 동물을 보면 나는 어떻게 할까요?',w:1}]
+};
+const EN_QUIZ={
+'e-01':[{t:'What did the hare and the tortoise have?',o:['a race','a party','a picnic'],a:0},{t:'What did the hare do under a tree?',o:['ate lunch','took a nap','read a book'],a:1},{t:'Who won the race?',o:['the hare','{name}','the tortoise'],a:2},{t:'Why did the tortoise win?',w:1}],
+'e-02':[{t:'What did the mouse run over?',o:["the lion's nose",'a tree','a rock'],a:0},{t:'What caught the lion?',o:['a box','a net','a rope'],a:1},{t:'How did the mouse help?',o:['It sang a song','It called for help','It chewed the net'],a:2},{t:'How can a little friend help you?',w:1}],
+'e-03':[{t:'What did the ant carry?',o:['food','toys','leaves'],a:0},{t:'What did the grasshopper do all day?',o:['worked hard','sang and played','slept'],a:1},{t:'What did the ant do in winter?',o:['went away','played games','shared her food'],a:2},{t:'What would you tell the grasshopper?',w:1}],
+'e-04':[{t:'How did the crow feel?',o:['sleepy','thirsty','cold'],a:1},{t:'What did the crow drop into the pitcher?',o:['stones','leaves','sticks'],a:0},{t:'What happened to the water?',o:['It went away','It came up','It froze'],a:1},{t:'What do you do when something is hard?',w:1}],
+'e-05':[{t:'What did the wind and the sun have?',o:['a race','a contest','a nap'],a:1},{t:'What did the man do when the wind blew?',o:['held his coat tight','took off his coat','ran home'],a:0},{t:'Who made the man take off his coat?',o:['the wind','the rain','the sun'],a:2},{t:'Why did the sun win?',w:1}],
+'e-06':[{t:'Where did the fox put the soup?',o:['in a flat dish','in a tall jar','in a cup'],a:0},{t:"Why couldn't the fox eat at the stork's lunch?",o:['He was not hungry','The food was in a tall jar','The food was cold'],a:1},{t:'What did the fox say?',o:['thank you','sorry','goodbye'],a:1},{t:'What food would you share with a friend?',w:1}]
+};

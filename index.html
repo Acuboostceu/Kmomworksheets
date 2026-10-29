@@ -186,6 +186,24 @@ select.text{appearance:auto}
 
 #sp-render-stage{position:fixed;left:-20000px;top:0;width:820px;pointer-events:none}
 
+/* ---- reading questions pages ---- */
+.qz{position:relative}
+.qz-box{border:1.5px solid #C9D3E3;border-radius:10px;padding:14px 18px;line-height:1.8;font-size:16px;color:#1A1A1A;background:#FAFBFD}
+.qz-box.ko{font-family:'Gowun Dodum','Noto Sans KR',sans-serif;font-size:17px}
+.qz-box.en{font-family:Andika,'Noto Sans KR',sans-serif;font-size:17px}
+.qz-lbl{font-size:13px;font-weight:700;color:#1F4E9A;margin:0 0 6px}
+.qz-q{margin-top:16px}
+.qz-t{font-size:17px;font-weight:700;color:#1A1A1A;display:flex;gap:8px}
+.qz-t b{color:#1F4E9A}
+.qz-o{display:flex;flex-direction:column;gap:6px;margin:8px 0 0 28px;font-size:16px;color:#1A1A1A}
+.qz-o span{display:flex;gap:10px;align-items:center}
+.qz-o i{font-style:normal;display:inline-flex;width:22px;height:22px;border:1.5px solid #8C99AC;border-radius:50%;align-items:center;justify-content:center;font-size:12px;color:#5A6472;flex:none}
+.qz-line{height:40px;border-bottom:1.5px solid #8C99AC;margin-left:28px}
+.qz-rule{position:relative;height:34px;margin:22px 0 0 28px;border-top:1.3px solid #9AA6B8;border-bottom:1.8px solid #4A5668}
+.qz-rule i{position:absolute;left:0;right:0;top:16px;border-top:1.2px dashed #B5BFCD}
+.qz-key{position:absolute;right:52px;bottom:30px;transform:rotate(180deg);font-size:11px;color:#9AA3AF;font-family:'Noto Sans KR',sans-serif}
+.esheet.qz .qz-t,.esheet.qz .qz-o{font-family:Andika,'Noto Sans KR',sans-serif}
+
 /* ---- site nav ---- */
 .site{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
@@ -247,6 +265,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
           <button type="button" data-dkcols="8">8칸</button><button type="button" data-dkcols="10">10칸</button><button type="button" data-dkcols="12">12칸</button><button type="button" data-dkcols="15">15칸</button>
         </div>
         <label class="switch"><input type="checkbox" id="d-ko-trace"> 쓰는 줄에 연한 글씨</label>
+        <label class="switch"><input type="checkbox" id="d-ko-quiz"> 이야기 끝에 독해 문제 한 장</label>
       </div>
     </div>
 
@@ -267,6 +286,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
           <button type="button" data-desize="L">Large</button><button type="button" data-desize="M">Medium</button><button type="button" data-desize="S">Small</button>
         </div>
         <label class="switch"><input type="checkbox" id="d-en-trace"> Light letters to trace</label>
+        <label class="switch"><input type="checkbox" id="d-en-quiz"> Reading questions at the end of each story</label>
       </div>
     </div>
 
@@ -433,6 +453,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       </fieldset>
     </div>
     <label class="switch"><input type="checkbox" id="k-sentnl"> 문장마다 새 줄에서 시작</label>
+    <label class="switch"><input type="checkbox" id="k-quiz" checked> 마지막에 독해 문제 한 장 넣기</label>
     <div class="story-box">
       <label class="lbl" for="story" style="margin:0">이야기 <span class="hint" style="font-weight:400">— 직접 쓰거나 고칠 수 있어요</span></label>
       <input class="text" id="title" type="text" maxlength="30" placeholder="제목">
@@ -537,6 +558,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       </fieldset>
     </div>
     <label class="switch" id="e-trace-lbl"><input type="checkbox" id="e-trace"> Light gray letters to trace on the first practice line</label>
+    <label class="switch" id="e-quiz-lbl"><input type="checkbox" id="e-quiz" checked> Add a reading questions page at the end</label>
     <div class="story-box" id="e-story-box">
       <label class="lbl" for="e-text" style="margin:0">Text <span class="hint" style="font-weight:400">— edit or paste your own</span></label>
       <input class="text" id="e-title" type="text" maxlength="40" placeholder="Title">
@@ -1143,6 +1165,21 @@ function cellHtml(ch,size){
   return '<div class="gc" style="width:'+size+'px;height:'+size+'px"><i class="h"></i><i class="v"></i>'+inner+'</div>';
 }
 function rowHtml(chars,cls,size,N){let h='<div class="gr '+cls+'">';for(let i=0;i<N;i++)h+=cellHtml(chars?chars[i]:'',size);return h+'</div>';}
+const CIRC=['①','②','③','④'];
+function koQuizHtml(storyId,name,aechin,label,W,H){
+  const s=KO_STORIES.find(x=>x.id===storyId);const qs=KO_QUIZ[storyId];if(!s||!qs)return '';
+  const R=t=>esc(renderWith(t,name,aechin));
+  let body='<div class="qz-box ko"><p class="qz-lbl">이야기를 다시 읽어 보세요</p>'+s.lines.map(R).join(' ')+'</div>';
+  qs.forEach((q,i)=>{
+    body+='<div class="qz-q"><div class="qz-t"><b>'+(i+1)+'.</b><span>'+R(q.t)+'</span></div>';
+    body+=q.w?'<div class="qz-line"></div><div class="qz-line"></div>':'<div class="qz-o">'+q.o.map((o,k)=>'<span>'+CIRC[k]+' '+R(o)+'</span>').join('')+'</div>';
+    body+='</div>';
+  });
+  const key='정답 '+qs.map((q,i)=>q.w?null:(i+1)+'-'+CIRC[q.a]).filter(Boolean).join('  ');
+  return '<div class="ksheet qz" style="width:'+W+'px;height:'+H+'px"><div class="s-head"><div class="s-title"><div class="s-code">'+esc(label||'글씨 연습')+' · 독해 문제</div><h2 class="s-h1">'+esc(s.title)+' — 생각하며 읽기</h2></div>'+
+    '<div class="s-fields"><div class="s-field"><span>이름</span><span class="s-line"></span></div><div class="s-field"><span>날짜</span><span class="s-line"></span></div></div></div>'+body+'<div class="qz-key">'+key+'</div></div>';
+}
+const quizOn=()=>$('k-quiz').checked&&!isMine()&&!!KO_QUIZ[state.storyId];
 function build(){
   const N=state.cols,g=geom();const lines=allLines();
   const total=Math.max(1,Math.ceil(lines.length/g.pairs));
@@ -1155,8 +1192,9 @@ function build(){
     sheets.push('<div class="ksheet" style="width:'+PG().w+'px;height:'+PG().h+'px"><div class="s-head"><div class="s-title"><div class="s-code">글씨 연습 · '+(p+1)+' / '+total+'</div><h2 class="s-h1">'+esc(title)+'</h2></div>'+
       '<div class="s-fields"><div class="s-field"><span>이름</span><span class="s-line"></span></div><div class="s-field"><span>날짜</span><span class="s-line"></span></div></div></div><div class="grid">'+grid+'</div></div>');
   }
+  if(lines.length&&quizOn())sheets.push(koQuizHtml(state.storyId,$('name').value,$('aechin').checked,'글씨 연습',PG().w,PG().h));
   state.sheets=lines.length?sheets:[];
-  $('k-countHint').textContent=lines.length?('이 이야기는 '+lines.length+'줄, '+total+'장이에요 (한 장에 '+g.pairs+'줄).'+((state.dirty&&!isMine())?' 직접 고친 내용이라 이름을 바꿔도 자동으로 바뀌지 않아요.':'')):'';
+  $('k-countHint').textContent=lines.length?('이 이야기는 '+lines.length+'줄, '+total+'장이에요'+(quizOn()?' + 독해 문제 1장':'')+' (한 장에 '+g.pairs+'줄).'+((state.dirty&&!isMine())?' 직접 고친 내용이라 이름을 바꿔도 자동으로 바뀌지 않아요.':'')):'';
   showPage();$('k-pdf').disabled=!lines.length;
 }
 function showPage(){
@@ -1183,6 +1221,7 @@ function seg(attr,key,parse){
 }
 seg('data-lv','lv',Number);seg('data-cols','cols',Number);seg('data-kpaper','paper',String);seg('data-trace','trace',v=>v==='1');
 $('k-sentnl').addEventListener('change',build);
+$('k-quiz').addEventListener('change',build);
 let nt;$('name').addEventListener('input',()=>{clearTimeout(nt);nt=setTimeout(()=>{if(!state.dirty)loadStory();},250);});
 $('aechin').addEventListener('change',()=>{if(!state.dirty)loadStory();});
 let et;$('story').addEventListener('input',()=>{state.dirty=true;showMine();clearTimeout(et);et=setTimeout(build,250);});
@@ -1264,14 +1303,16 @@ window.KMOM_KO={
     const paras=s.lines.map(t=>renderWith(t,o.name,o.aechin!==false));
     let lines=[];
     if(o.sentnl)paras.forEach(pp=>{lines=lines.concat(wrapText(pp,N));});else lines=wrapText(paras.join(' '),N);
-    const total=Math.max(1,Math.ceil(lines.length/g.pairs));
+    const wtotal=Math.max(1,Math.ceil(lines.length/g.pairs));
+    const hasQ=!!o.quiz&&!!KO_QUIZ[s.id];const total=wtotal+(hasQ?1:0);
     const W=PG().w,H=PG().h;
     Object.assign(state,keep);
     return {title:s.title,total,page(p,label){
+      if(hasQ&&p===wtotal)return koQuizHtml(s.id,o.name,o.aechin!==false,label,W,H);
       let grid='';
       for(let r=0;r<g.pairs;r++){const ln=lines[p*g.pairs+r]||null;
         grid+='<div style="margin-top:'+(r?g.gap:0)+'px">'+rowHtml(ln,'story',g.cell,N)+rowHtml(o.trace?ln:null,'practice',g.cell,N)+'</div>';}
-      return '<div class="ksheet" style="width:'+W+'px;height:'+H+'px"><div class="s-head"><div class="s-title"><div class="s-code">'+esc(label||'글씨 연습')+' · '+(p+1)+' / '+total+'장</div><h2 class="s-h1">'+esc(s.title)+'</h2></div>'+
+      return '<div class="ksheet" style="width:'+W+'px;height:'+H+'px"><div class="s-head"><div class="s-title"><div class="s-code">'+esc(label||'글씨 연습')+' · '+(p+1)+' / '+wtotal+'장</div><h2 class="s-h1">'+esc(s.title)+'</h2></div>'+
         '<div class="s-fields"><div class="s-field"><span>이름</span><span class="s-line"></span></div><div class="s-field"><span>날짜</span><span class="s-line"></span></div></div></div><div class="grid">'+grid+'</div></div>';
     }};
   }
@@ -1367,20 +1408,40 @@ function pageTitle(){
   if(state.mode==='alpha')return (state.style==='cursive'?'Cursive':'Print')+' Alphabet';
   return $('e-title').value.trim()||'Handwriting Practice';
 }
+const LET=['a','b','c','d'];
+function enQuizEl(storyId,name,label,W,H){
+  const s=EN_STORIES.find(x=>x.id===storyId);const qs=EN_QUIZ[storyId];
+  const el=document.createElement('div');el.className='esheet qz';el.style.width=W+'px';el.style.height=H+'px';
+  if(!s||!qs)return el;
+  const F=t=>esc(fillWith(t,name));
+  let body='<div class="qz-box en"><p class="qz-lbl">Read the story again.</p>'+s.lines.map(F).join(' ')+'</div>';
+  qs.forEach((q,i)=>{
+    body+='<div class="qz-q"><div class="qz-t"><b>'+(i+1)+'.</b><span>'+F(q.t)+'</span></div>';
+    body+=q.w?'<div class="qz-rule"><i></i></div><div class="qz-rule"><i></i></div>':'<div class="qz-o">'+q.o.map((o,k)=>'<span><i>'+LET[k]+'</i>'+F(o)+'</span>').join('')+'</div>';
+    body+='</div>';
+  });
+  const key='Answers: '+qs.map((q,i)=>q.w?null:(i+1)+'-'+LET[q.a]).filter(Boolean).join('  ');
+  el.innerHTML='<div class="s-head"><div class="s-title"><div class="s-code">'+esc(label||'Handwriting Practice')+' · Reading Questions</div><h2 class="s-h1">'+esc(s.title)+'</h2></div>'+
+    '<div class="s-fields"><div class="s-field"><span>Name</span><span class="s-line"></span></div><div class="s-field"><span>Date</span><span class="s-line"></span></div></div></div>'+body+'<div class="qz-key">'+key+'</div>';
+  return el;
+}
+const enQuizOn=()=>state.mode==='story'&&$('e-quiz').checked&&!isMine()&&!!EN_QUIZ[state.storyId];
 function build(){
   const g=geom();
   const lines=state.mode==='alpha'?alphaUnits():wrap($('e-text').value,g.cw-24,g.fs);
   const per=g.groups;const total=Math.max(1,Math.ceil(lines.length/per));
   state.pages=[];
   if(lines.length)for(let p=0;p<total;p++)state.pages.push(lines.slice(p*per,(p+1)*per));
+  if(lines.length&&enQuizOn())state.pages.push({quiz:true});
   if(state.mode==='alpha'){$('e-pdf').disabled=false;showPage();return;}
-  $('e-countHint').textContent=lines.length?(lines.length+' model lines, '+total+(total>1?' pages':' page')+' ('+per+' per page).'+((state.dirty&&!isMine())?' Edited text: changing the name won’t update it.':'')):'';
+  $('e-countHint').textContent=lines.length?(lines.length+' model lines, '+total+(total>1?' pages':' page')+(enQuizOn()?' + 1 reading page':'')+' ('+per+' per page).'+((state.dirty&&!isMine())?' Edited text: changing the name won’t update it.':'')):'';
   $('e-pdf').disabled=!lines.length;
   showPage();
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function makePage(i,ov){
-  const g=geom();const W=PG().w,H=PG().h;const total=ov?ov.total:state.pages.length;
+  if(!ov&&state.pages[i]&&state.pages[i].quiz)return enQuizEl(state.storyId,$('e-name').value,'Handwriting Practice',PG().w,PG().h);
+  const g=geom();const W=PG().w,H=PG().h;const total=ov?ov.total:state.pages.filter(x=>!x.quiz).length;
   const el=document.createElement('div');el.className='esheet';el.style.width=W+'px';el.style.height=H+'px';
   el.innerHTML='<div class="s-head"><div class="s-title"><div class="s-code">'+esc(ov&&ov.label?ov.label:'Handwriting Practice')+' · '+(i+1)+' / '+total+'</div><h2 class="s-h1">'+esc(ov?ov.title:pageTitle())+'</h2></div>'+
     '<div class="s-fields"><div class="s-field"><span>Name</span><span class="s-line"></span></div><div class="s-field"><span>Date</span><span class="s-line"></span></div></div></div>';
@@ -1441,7 +1502,7 @@ document.querySelectorAll('[data-emode]').forEach(b=>b.addEventListener('click',
   state.mode=b.dataset.emode;
   document.querySelectorAll('[data-emode]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
   const alpha=state.mode==='alpha';
-  $('e-story-fs').hidden=alpha;$('e-story-box').hidden=alpha;$('e-trace-lbl').hidden=alpha;$('e-alpha-fs').hidden=!alpha;
+  $('e-story-fs').hidden=alpha;$('e-story-box').hidden=alpha;$('e-trace-lbl').hidden=alpha;$('e-quiz-lbl').hidden=alpha;$('e-alpha-fs').hidden=!alpha;
   $('e-countHint').textContent='';state.cur=0;build();
 }));
 document.querySelectorAll('[data-estyle]').forEach(b=>b.addEventListener('click',()=>{
@@ -1452,6 +1513,7 @@ document.querySelectorAll('[data-estyle]').forEach(b=>b.addEventListener('click'
   if(document.fonts&&document.fonts.load)document.fonts.load(fam).then(go,go);else go();
 }));seg('data-erep','rep',Number);seg('data-epaper','paper',String);
 $('e-trace').addEventListener('change',showPage);
+$('e-quiz').addEventListener('change',build);
 let nt;$('e-name').addEventListener('input',()=>{clearTimeout(nt);nt=setTimeout(()=>{if(!state.dirty)loadStory();},250);});
 let et;$('e-text').addEventListener('input',()=>{state.dirty=true;showMine();clearTimeout(et);et=setTimeout(build,250);});
 $('e-save').addEventListener('click',()=>{
@@ -1513,10 +1575,13 @@ window.KMOM_EN={
       else{const s=EN_STORIES.find(x=>x.id===o.storyId)||EN_STORIES[0];title=s.title;lines=wrap(s.lines.map(t=>fillWith(t,o.name)).join('\n'),g.cw-24,g.fs);}
       var per=g.groups;
     }finally{restore();}
-    const total=Math.max(1,Math.ceil(lines.length/per));
+    const wtotal=Math.max(1,Math.ceil(lines.length/per));
+    const hasQ=o.mode==='story'&&!!o.quiz&&!!EN_QUIZ[o.storyId];const total=wtotal+(hasQ?1:0);
+    const P=o.paper==='a4'?{w:794,h:1123}:{w:816,h:1056};
     return {title,total,page(p,label){
+      if(hasQ&&p===wtotal)return enQuizEl(o.storyId,o.name,label,P.w,P.h);
       const r=apply();
-      try{return makePage(p,{rows:lines.slice(p*per,(p+1)*per),title,total,label,trace:o.trace});}finally{r();}
+      try{return makePage(p,{rows:lines.slice(p*per,(p+1)*per),title,total:wtotal,label,trace:o.trace});}finally{r();}
     }};
   }
 };
@@ -1531,8 +1596,8 @@ const $=id=>document.getElementById(id);
 const KEY='kmom.daily.v1';
 const clone=o=>JSON.parse(JSON.stringify(o));
 const DEF={day:1,last:null,prev:null,name:'',ename:'',paper:'letter',
-  ko:{on:true,storyId:KMOM_KO.stories[0].id,page:0,cols:10,trace:false},
-  en:{on:true,mode:'story',storyId:KMOM_EN.stories[0].id,page:0,style:'print',size:'L',trace:true},
+  ko:{on:true,storyId:KMOM_KO.stories[0].id,page:0,cols:10,trace:false,quiz:true},
+  en:{on:true,mode:'story',storyId:KMOM_EN.stories[0].id,page:0,style:'print',size:'L',trace:true,quiz:true},
   ma:{on:true,l1:'ADD-05',l2:'',format:'v',locale:'ko',count:20}};
 function load(){
   try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(!v)return clone(DEF);
@@ -1552,6 +1617,7 @@ fillSelect($('d-ma-l2'),[{v:'',t:'섞지 않음'}].concat(KMOM_MATH.levels.map(l
 $('d-name').value=S.name;$('d-ename').value=S.ename;
 $('d-ko-on').checked=S.ko.on;$('d-en-on').checked=S.en.on;$('d-ma-on').checked=S.ma.on;
 $('d-ko-trace').checked=S.ko.trace;$('d-en-trace').checked=S.en.trace;
+$('d-ko-quiz').checked=S.ko.quiz;$('d-en-quiz').checked=S.en.quiz;
 
 function segInit(attr,get,set,isMath){
   const btns=document.querySelectorAll('['+attr+']');
@@ -1577,6 +1643,8 @@ on('d-en-on','change',()=>{S.en.on=$('d-en-on').checked;changed();});
 on('d-ma-on','change',()=>{S.ma.on=$('d-ma-on').checked;changed();});
 on('d-ko-trace','change',()=>{S.ko.trace=$('d-ko-trace').checked;changed();});
 on('d-en-trace','change',()=>{S.en.trace=$('d-en-trace').checked;changed();});
+on('d-ko-quiz','change',()=>{S.ko.quiz=$('d-ko-quiz').checked;changed();});
+on('d-en-quiz','change',()=>{S.en.quiz=$('d-en-quiz').checked;changed();});
 on('d-ko-story','change',()=>{S.ko.storyId=$('d-ko-story').value;S.ko.page=0;changed();});
 on('d-en-story','change',()=>{S.en.storyId=$('d-en-story').value;S.en.page=0;changed();});
 on('d-ko-page','change',()=>{S.ko.page=+$('d-ko-page').value;changed();});
@@ -1594,16 +1662,16 @@ async function render(){
   const items=[];
   $('d-en-story').disabled=S.en.mode==='alpha';
   if(S.ko.on){
-    const p=KMOM_KO.plan({storyId:S.ko.storyId,name:S.name,aechin:true,cols:S.ko.cols,trace:S.ko.trace,paper:S.paper});
+    const p=KMOM_KO.plan({storyId:S.ko.storyId,name:S.name,aechin:true,cols:S.ko.cols,trace:S.ko.trace,paper:S.paper,quiz:S.ko.quiz});
     plans.ko=p;if(S.ko.page>=p.total)S.ko.page=p.total-1;
-    fillSelect($('d-ko-page'),Array.from({length:p.total},(_,i)=>({v:i,t:(i+1)+' / '+p.total+'장'})),S.ko.page);
+    fillSelect($('d-ko-page'),Array.from({length:p.total},(_,i)=>({v:i,t:(S.ko.quiz&&i===p.total-1&&p.total>1?'독해 문제':(i+1)+'장')})),S.ko.page);
     items.push({html:p.page(S.ko.page,dayLabelKo())});
   }
   if(S.en.on){
-    const p=await KMOM_EN.plan({mode:S.en.mode,ecase:'lower',storyId:S.en.storyId,name:S.ename,style:S.en.style,size:S.en.size,rep:1,paper:S.paper,trace:S.en.trace});
+    const p=await KMOM_EN.plan({mode:S.en.mode,ecase:'lower',storyId:S.en.storyId,name:S.ename,style:S.en.style,size:S.en.size,rep:1,paper:S.paper,trace:S.en.trace,quiz:S.en.quiz});
     if(render.tok!==tok)return;
     plans.en=p;if(S.en.page>=p.total)S.en.page=p.total-1;
-    fillSelect($('d-en-page'),Array.from({length:p.total},(_,i)=>({v:i,t:'Page '+(i+1)+' / '+p.total})),S.en.page);
+    fillSelect($('d-en-page'),Array.from({length:p.total},(_,i)=>({v:i,t:(S.en.quiz&&S.en.mode==='story'&&i===p.total-1&&p.total>1?'Reading questions':'Page '+(i+1))})),S.en.page);
     items.push({make:()=>p.page(S.en.page,'Daily Page · Day '+S.day)});
   }
   if(S.ma.on){
