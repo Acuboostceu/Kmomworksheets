@@ -174,6 +174,16 @@ textarea.text.en{font-family:Andika,system-ui,sans-serif}
 .mine-bar[hidden]{display:none}
 .lv.new .code{background:var(--accent);color:var(--accent-ink)}
 
+/* ---- daily tab ---- */
+#d-render-stage{position:fixed;left:-20000px;top:0;width:820px;pointer-events:none}
+.day-card{border:1px dashed var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.day-n{font-weight:900;font-size:24px;margin-right:10px;color:var(--accent)}
+.box-h{min-height:48px;display:flex;align-items:center}
+.inline-check{display:flex;align-items:center;gap:10px;font-weight:700;cursor:pointer}
+.inline-check input{width:20px;height:20px;accent-color:var(--accent)}
+select.text{appearance:auto}
+.tabs{overflow-x:auto;max-width:100%}
+
 /* ---- site nav ---- */
 .site{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
@@ -193,12 +203,117 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <div class="site-in">
     <span class="brand">Kmom 학습지<small>Kmom Worksheets</small></span>
     <div class="tabs">
+      <a href="#daily" data-tab="daily">오늘의 한 장</a>
       <a href="#math" data-tab="math">수학 연산지</a>
       <a href="#hangul" data-tab="hangul">한글 글씨 연습</a>
       <a href="#english" data-tab="english">English</a>
     </div>
   </div>
 </nav>
+
+<section class="tab-sec" id="sec-daily" aria-label="오늘의 한 장" hidden>
+<header class="top">
+  <h1>오늘의 한 장</h1>
+  <p>한글 한 장, 영어 한 장, 수학 한 장을 하루치로 묶어 PDF 하나로 뽑아요. 이야기는 어제 쓴 다음 장부터 이어져요.</p>
+</header>
+<main class="layout">
+  <section class="panel" aria-label="오늘의 한 장 설정">
+    <div class="day-card">
+      <div><span class="day-n" id="d-day">Day 1</span><span class="hint" id="d-last"></span></div>
+      <p class="hint" id="d-summary"></p>
+    </div>
+    <div class="row2">
+      <div>
+        <label class="lbl" for="d-name" style="display:block">아이 이름 (한글)</label>
+        <input class="text" id="d-name" type="text" maxlength="10" placeholder="예: 서윤" autocomplete="off">
+      </div>
+      <div>
+        <label class="lbl" for="d-ename" style="display:block">영어 이름</label>
+        <input class="text" id="d-ename" type="text" maxlength="16" placeholder="e.g. Emma" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="ai-box">
+      <div class="box-h"><label class="inline-check"><input type="checkbox" id="d-ko-on" checked> 한글 글씨 연습</label></div>
+      <div class="ai-in">
+        <div class="row2">
+          <div><label class="hint" for="d-ko-story">이야기</label><select class="text" id="d-ko-story"></select></div>
+          <div><label class="hint" for="d-ko-page">오늘 쓸 장</label><select class="text" id="d-ko-page"></select></div>
+        </div>
+        <div class="seg" role="group" aria-label="한 줄 칸 수">
+          <button type="button" data-dkcols="8">8칸</button><button type="button" data-dkcols="10">10칸</button><button type="button" data-dkcols="12">12칸</button><button type="button" data-dkcols="15">15칸</button>
+        </div>
+        <label class="switch"><input type="checkbox" id="d-ko-trace"> 쓰는 줄에 연한 글씨</label>
+      </div>
+    </div>
+
+    <div class="ai-box">
+      <div class="box-h"><label class="inline-check"><input type="checkbox" id="d-en-on" checked> English</label></div>
+      <div class="ai-in">
+        <div class="seg" role="group" aria-label="English content">
+          <button type="button" data-demode="story">Story</button><button type="button" data-demode="alpha">Alphabet</button>
+        </div>
+        <div class="row2">
+          <div><label class="hint" for="d-en-story">Story</label><select class="text" id="d-en-story"></select></div>
+          <div><label class="hint" for="d-en-page">Today’s page</label><select class="text" id="d-en-page"></select></div>
+        </div>
+        <div class="seg" role="group" aria-label="Letter style">
+          <button type="button" data-destyle="print">Print</button><button type="button" data-destyle="cursive">Cursive</button>
+        </div>
+        <div class="seg" role="group" aria-label="Line size">
+          <button type="button" data-desize="L">Large</button><button type="button" data-desize="M">Medium</button><button type="button" data-desize="S">Small</button>
+        </div>
+        <label class="switch"><input type="checkbox" id="d-en-trace"> Light letters to trace</label>
+      </div>
+    </div>
+
+    <div class="ai-box">
+      <div class="box-h"><label class="inline-check"><input type="checkbox" id="d-ma-on" checked> 수학 연산지</label></div>
+      <div class="ai-in">
+        <div class="row2">
+          <div><label class="hint" for="d-ma-l1">레벨</label><select class="text" id="d-ma-l1"></select></div>
+          <div><label class="hint" for="d-ma-l2">섞을 레벨 (선택)</label><select class="text" id="d-ma-l2"></select></div>
+        </div>
+        <div class="row2">
+          <div class="seg" role="group" aria-label="형식"><button type="button" data-dmfmt="v">세로셈</button><button type="button" data-dmfmt="h">가로셈</button></div>
+          <div class="seg" role="group" aria-label="버전"><button type="button" data-dmloc="ko">한국</button><button type="button" data-dmloc="en">미국</button></div>
+        </div>
+        <div class="seg" role="group" aria-label="문제 수">
+          <button type="button" data-dmcount="12">12문제</button><button type="button" data-dmcount="16">16문제</button><button type="button" data-dmcount="20">20문제</button>
+        </div>
+        <p class="hint">수학은 매일 새 문제로 바뀌어요. 레벨에 따라 문제 수가 가장 가까운 값으로 맞춰져요.</p>
+      </div>
+    </div>
+
+    <fieldset>
+      <legend>용지</legend>
+      <div class="seg" role="group" aria-label="용지 크기">
+        <button type="button" data-dpaper="letter">Letter</button><button type="button" data-dpaper="a4">A4</button>
+      </div>
+    </fieldset>
+
+    <button class="primary" id="d-make" type="button">오늘의 한 장 PDF 저장</button>
+    <div class="mine-bar">
+      <button class="secondary" id="d-next" type="button">다음 날로 넘기기</button>
+      <button class="secondary" id="d-undo" type="button">하루 되돌리기</button>
+    </div>
+    <p class="hint">PDF를 저장하면 진도가 자동으로 다음 날로 넘어가요. 설정과 진도는 이 브라우저에만 저장돼요.</p>
+  </section>
+
+  <section class="preview" aria-label="오늘의 한 장 미리보기">
+    <div class="bar">
+      <div class="pager">
+        <button type="button" id="d-prev" aria-label="이전 장"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <span id="d-pageinfo">0 / 0</span>
+        <button type="button" id="d-nextp" aria-label="다음 장"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+      <button class="secondary" id="d-refresh" type="button">수학 문제 새로</button>
+    </div>
+    <div class="status" id="d-status" role="status" aria-live="polite"></div>
+    <div class="stage" id="d-stage"><div class="empty">준비 중…</div></div>
+  </section>
+</main>
+</section>
 
 <section class="tab-sec" id="sec-math" aria-label="수학 연산지">
 <header class="top">
@@ -451,6 +566,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 <div id="render-stage" aria-hidden="true"></div>
 <div id="k-render-stage" aria-hidden="true"></div>
 <div id="e-render-stage" aria-hidden="true"></div>
+<div id="d-render-stage" aria-hidden="true"></div>
 
 <script src="stories.js"></script>
 <script>
@@ -474,8 +590,8 @@ function MyStore(key){
 /* tabs (hash routing) */
 (function(){
   function show(){
-    const t=location.hash==='#hangul'?'hangul':(location.hash==='#english'?'english':'math');
-    ['math','hangul','english'].forEach(k=>{document.getElementById('sec-'+k).hidden=t!==k;});
+    const h=location.hash.slice(1);const t=['daily','hangul','english'].includes(h)?h:'math';
+    ['daily','math','hangul','english'].forEach(k=>{document.getElementById('sec-'+k).hidden=t!==k;});
     document.querySelectorAll('[data-tab]').forEach(a=>a.setAttribute('aria-current',a.dataset.tab===t?'page':'false'));
     window.dispatchEvent(new Event('resize'));
   }
@@ -625,7 +741,7 @@ function codeLine(){
 }
 function subLine(){return state.picked.map(c=>state.locale==='en'?EN[c]:BY[c].name).join(' / ');}
 function header(idx,total){
-  return '<div class="s-head"><div class="s-title"><div class="s-code">'+esc(codeLine())+' · '+(idx+1)+' / '+total+'</div>'+
+  return '<div class="s-head"><div class="s-title"><div class="s-code">'+(state.dayLabel?esc(state.dayLabel)+' · ':'')+esc(codeLine())+(total>1?' · '+(idx+1)+' / '+total:'')+'</div>'+
     '<h2 class="s-h1">'+titleFor()+L().practice+'</h2><div class="s-sub">'+esc(subLine())+'</div></div>'+
     '<div class="s-fields"><div class="s-field"><span>'+L().name+'</span><span class="s-line"></span></div>'+
     '<div class="s-field"><span>'+L().date+'</span><span class="s-line"></span><span style="margin-left:8px">'+L().score+'</span><span class="s-score"></span><span>/ '+state.count+'</span></div></div></div>';
@@ -828,6 +944,23 @@ $('pdf').addEventListener('click',async()=>{
 
 renderLevels();renderPicked();renderCounts();
 if(!location.hash||location.hash==='#math')$('gen').click();
+window.addEventListener('hashchange',()=>{if((location.hash==='#math'||!location.hash)&&!state.pages.length&&state.picked.length)$('gen').click();});
+
+/* export for the daily packet: one sheet with explicit settings, UI state untouched */
+window.KMOM_MATH={
+  levels:LEVELS.map(l=>({code:l.code,name:l.name})),
+  sheetHtml(o){
+    const keys=['picked','ratio','format','count','sheets','locale','paper','dayLabel','sheetData'];
+    const keep={};keys.forEach(k=>keep[k]=state[k]);
+    try{
+      Object.assign(state,{picked:o.picked.filter(c=>BY[c]).slice(0,2),ratio:o.ratio||50,format:o.format,sheets:1,locale:o.locale,paper:o.paper,dayLabel:o.dayLabel||''});
+      const opts=countOptions();state.count=opts.includes(o.count)?o.count:opts.reduce((a,b)=>Math.abs(b-o.count)<Math.abs(a-o.count)?b:a);
+      if(!state.picked.length)return '';
+      generate();
+      return state.format==='v'?vSheet(state.sheetData[0],0,1):hSheet(state.sheetData[0],0,1);
+    }finally{Object.assign(state,keep);}
+  }
+};
 })();
 </script>
 <script>
@@ -843,10 +976,11 @@ const PUNCT=new Set(['.',',','!','?']);
 /* ---- name + particles ---- */
 function hasBatchim(s){if(!s)return false;const c=s.charCodeAt(s.length-1);if(c<0xAC00||c>0xD7A3)return false;return (c-0xAC00)%28!==0;}
 const JOSA={'가':['이','가'],'는':['은','는'],'를':['을','를'],'와':['과','와']};
-function renderTpl(tpl){
-  const n=$('name').value.trim()||'친구';
+function renderTpl(tpl){return renderWith(tpl,$('name').value,$('aechin').checked);}
+function renderWith(tpl,rawName,aechin){
+  const n=(rawName||'').trim()||'친구';
   const b=hasBatchim(n);
-  const call=($('aechin').checked&&b)?n+'이':n;
+  const call=(aechin&&b)?n+'이':n;
   return tpl.replace(/\{N(?::([^}]+))?\}/g,(m,p)=>{
     if(!p)return call;
     if(p==='야')return n+(b?'아':'야');
@@ -1039,6 +1173,30 @@ $('k-pdf').addEventListener('click',async()=>{
 });
 
 renderList();loadStory();
+
+/* export for the daily packet */
+window.KMOM_KO={
+  stories:KO_STORIES.map(s=>({id:s.id,title:s.title})),
+  plan(o){
+    const s=KO_STORIES.find(x=>x.id===o.storyId)||KO_STORIES[0];
+    const keep={cols:state.cols,paper:state.paper};
+    state.cols=o.cols;state.paper=o.paper;
+    const g=geom();const N=o.cols;
+    const paras=s.lines.map(t=>renderWith(t,o.name,o.aechin!==false));
+    let lines=[];
+    if(o.sentnl)paras.forEach(pp=>{lines=lines.concat(wrapText(pp,N));});else lines=wrapText(paras.join(' '),N);
+    const total=Math.max(1,Math.ceil(lines.length/g.pairs));
+    const W=PG().w,H=PG().h;
+    Object.assign(state,keep);
+    return {title:s.title,total,page(p,label){
+      let grid='';
+      for(let r=0;r<g.pairs;r++){const ln=lines[p*g.pairs+r]||null;
+        grid+='<div style="margin-top:'+(r?g.gap:0)+'px">'+rowHtml(ln,'story',g.cell,N)+rowHtml(o.trace?ln:null,'practice',g.cell,N)+'</div>';}
+      return '<div class="ksheet" style="width:'+W+'px;height:'+H+'px"><div class="s-head"><div class="s-title"><div class="s-code">'+esc(label||'글씨 연습')+' · '+(p+1)+' / '+total+'장</div><h2 class="s-h1">'+esc(s.title)+'</h2></div>'+
+        '<div class="s-fields"><div class="s-field"><span>이름</span><span class="s-line"></span></div><div class="s-field"><span>날짜</span><span class="s-line"></span></div></div></div><div class="grid">'+grid+'</div></div>';
+    }};
+  }
+};
 })();
 </script>
 <script>
@@ -1054,7 +1212,8 @@ const state={mode:'story',ecase:'lower',style:'print',storyId:EN_STORIES[0].id,s
 const PG=()=>PAPER[state.paper];
 const mctx=document.createElement('canvas').getContext('2d');
 
-function fill(t){return t.replace(/\{name\}/g,$('e-name').value.trim()||'Sam');}
+function fill(t){return fillWith(t,$('e-name').value);}
+function fillWith(t,name){return t.replace(/\{name\}/g,(name||'').trim()||'Sam');}
 const store=MyStore('kmom.en.custom');
 const EN_PH='e.g. Today I went to the beach.\nI found a pink shell.\nI gave it to my mom.\n\nWrite about your child’s day, a family trip, or a thank-you note. One sentence per line works well.';
 const isMine=()=>state.storyId==='new'||state.storyId.startsWith('my-');
@@ -1141,16 +1300,17 @@ function build(){
   showPage();
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-function makePage(i){
-  const g=geom();const W=PG().w,H=PG().h;const total=state.pages.length;
+function makePage(i,ov){
+  const g=geom();const W=PG().w,H=PG().h;const total=ov?ov.total:state.pages.length;
   const el=document.createElement('div');el.className='esheet';el.style.width=W+'px';el.style.height=H+'px';
-  el.innerHTML='<div class="s-head"><div class="s-title"><div class="s-code">Handwriting Practice · '+(i+1)+' / '+total+'</div><h2 class="s-h1">'+esc(pageTitle())+'</h2></div>'+
+  el.innerHTML='<div class="s-head"><div class="s-title"><div class="s-code">'+esc(ov&&ov.label?ov.label:'Handwriting Practice')+' · '+(i+1)+' / '+total+'</div><h2 class="s-h1">'+esc(ov?ov.title:pageTitle())+'</h2></div>'+
     '<div class="s-fields"><div class="s-field"><span>Name</span><span class="s-line"></span></div><div class="s-field"><span>Date</span><span class="s-line"></span></div></div></div>';
   const cv=document.createElement('canvas');const DPR=2;
   cv.width=g.cw*DPR;cv.height=g.ch*DPR;cv.style.width=g.cw+'px';cv.style.height=g.ch+'px';
   el.appendChild(cv);
   const c=cv.getContext('2d');c.scale(DPR,DPR);c.fillStyle='#fff';c.fillRect(0,0,g.cw,g.ch);
-  const rows=state.pages[i]||[];
+  const rows=(ov?ov.rows:state.pages[i])||[];
+  const traceOn=ov?ov.trace:$('e-trace').checked;
   function ruled(y){
     c.setLineDash([]);c.strokeStyle='#9AA6B8';c.lineWidth=1.5;c.beginPath();c.moveTo(0,y);c.lineTo(g.cw,y);c.stroke();
     c.setLineDash([8,6]);c.strokeStyle='#B5BFCD';c.lineWidth=1.2;c.beginPath();c.moveTo(0,y+g.u/2);c.lineTo(g.cw,y+g.u/2);c.stroke();
@@ -1168,7 +1328,7 @@ function makePage(i){
     }else if(text){c.fillStyle='#1A1A1A';c.fillText(text,12,y+g.u);}
     for(let r=0;r<state.rep;r++){
       y+=g.rh+g.rowGap;ruled(y);
-      if(r===0&&text&&state.mode==='story'&&$('e-trace').checked){c.fillStyle='#C3CAD4';c.fillText(text,12,y+g.u);}
+      if(r===0&&text&&state.mode==='story'&&traceOn){c.fillStyle='#C3CAD4';c.fillText(text,12,y+g.u);}
     }
     y+=g.rh+g.groupGap;
   }
@@ -1255,8 +1415,193 @@ $('e-pdf').addEventListener('click',async()=>{
 });
 
 renderList();
+
+/* export for the daily packet */
+window.KMOM_EN={
+  stories:EN_STORIES.map(s=>({id:s.id,title:s.title})),
+  async plan(o){
+    const fam=o.style==='cursive'?'40px "Playwrite US Trad"':'40px Andika';
+    try{if(document.fonts&&document.fonts.load)await document.fonts.load(fam);}catch(e){}
+    const keys=['mode','ecase','style','size','rep','paper','xRatio'];
+    const apply=()=>{const keep={};keys.forEach(k=>keep[k]=state[k]);const keepF=FONT;
+      Object.assign(state,{mode:o.mode,ecase:o.ecase||'lower',style:o.style,size:o.size,rep:o.rep,paper:o.paper});FONT=FONTS[o.style];measureFont();
+      return ()=>{Object.assign(state,keep);FONT=keepF;};};
+    const restore=apply();
+    let lines,title;
+    try{
+      const g=geom();
+      if(o.mode==='alpha'){lines=alphaUnits();title=(o.style==='cursive'?'Cursive':'Print')+' Alphabet';}
+      else{const s=EN_STORIES.find(x=>x.id===o.storyId)||EN_STORIES[0];title=s.title;lines=wrap(s.lines.map(t=>fillWith(t,o.name)).join('\n'),g.cw-24,g.fs);}
+      var per=g.groups;
+    }finally{restore();}
+    const total=Math.max(1,Math.ceil(lines.length/per));
+    return {title,total,page(p,label){
+      const r=apply();
+      try{return makePage(p,{rows:lines.slice(p*per,(p+1)*per),title,total,label,trace:o.trace});}finally{r();}
+    }};
+  }
+};
 const start=()=>{measureFont();loadStory();};
 if(document.fonts&&document.fonts.load){document.fonts.load('40px Andika').then(start,start);}else start();
+})();
+</script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const KEY='kmom.daily.v1';
+const clone=o=>JSON.parse(JSON.stringify(o));
+const DEF={day:1,last:null,prev:null,name:'',ename:'',paper:'letter',
+  ko:{on:true,storyId:KMOM_KO.stories[0].id,page:0,cols:10,trace:false},
+  en:{on:true,mode:'story',storyId:KMOM_EN.stories[0].id,page:0,style:'print',size:'L',trace:true},
+  ma:{on:true,l1:'ADD-05',l2:'',format:'v',locale:'ko',count:20}};
+function load(){
+  try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(!v)return clone(DEF);
+    const o=clone(DEF);for(const k in v){if(v[k]&&typeof v[k]==='object'&&!Array.isArray(v[k])&&o[k]&&typeof o[k]==='object'&&k!=='prev')Object.assign(o[k],v[k]);else o[k]=v[k];}return o;
+  }catch(e){return clone(DEF);}
+}
+let S=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+let mathHtml=null, plans={ko:null,en:null}, pages=[], cur=0, busy=false;
+
+/* ---- controls ---- */
+function fillSelect(el,items,val){el.innerHTML=items.map(i=>'<option value="'+i.v+'">'+i.t.replace(/</g,'&lt;')+'</option>').join('');el.value=val;}
+fillSelect($('d-ko-story'),KMOM_KO.stories.map(s=>({v:s.id,t:s.title})),S.ko.storyId);
+fillSelect($('d-en-story'),KMOM_EN.stories.map(s=>({v:s.id,t:s.title})),S.en.storyId);
+fillSelect($('d-ma-l1'),KMOM_MATH.levels.map(l=>({v:l.code,t:l.code+'  '+l.name})),S.ma.l1);
+fillSelect($('d-ma-l2'),[{v:'',t:'섞지 않음'}].concat(KMOM_MATH.levels.map(l=>({v:l.code,t:l.code+'  '+l.name}))),S.ma.l2);
+$('d-name').value=S.name;$('d-ename').value=S.ename;
+$('d-ko-on').checked=S.ko.on;$('d-en-on').checked=S.en.on;$('d-ma-on').checked=S.ma.on;
+$('d-ko-trace').checked=S.ko.trace;$('d-en-trace').checked=S.en.trace;
+
+function segInit(attr,get,set,isMath){
+  const btns=document.querySelectorAll('['+attr+']');
+  const paint=()=>btns.forEach(b=>b.setAttribute('aria-pressed',String(b.getAttribute(attr))===String(get())?'true':'false'));
+  btns.forEach(b=>b.addEventListener('click',()=>{set(b.getAttribute(attr));paint();if(isMath)mathHtml=null;changed();}));
+  paint();
+}
+segInit('data-dkcols',()=>S.ko.cols,v=>{S.ko.cols=+v;});
+segInit('data-demode',()=>S.en.mode,v=>{S.en.mode=v;S.en.page=0;});
+segInit('data-destyle',()=>S.en.style,v=>{S.en.style=v;});
+segInit('data-desize',()=>S.en.size,v=>{S.en.size=v;});
+segInit('data-dmfmt',()=>S.ma.format,v=>{S.ma.format=v;},true);
+segInit('data-dmloc',()=>S.ma.locale,v=>{S.ma.locale=v;},true);
+segInit('data-dmcount',()=>S.ma.count,v=>{S.ma.count=+v;},true);
+segInit('data-dpaper',()=>S.paper,v=>{S.paper=v;},true);
+
+const on=(id,ev,fn)=>$(id).addEventListener(ev,fn);
+let nt;
+on('d-name','input',()=>{S.name=$('d-name').value;clearTimeout(nt);nt=setTimeout(changed,300);});
+on('d-ename','input',()=>{S.ename=$('d-ename').value;clearTimeout(nt);nt=setTimeout(changed,300);});
+on('d-ko-on','change',()=>{S.ko.on=$('d-ko-on').checked;changed();});
+on('d-en-on','change',()=>{S.en.on=$('d-en-on').checked;changed();});
+on('d-ma-on','change',()=>{S.ma.on=$('d-ma-on').checked;changed();});
+on('d-ko-trace','change',()=>{S.ko.trace=$('d-ko-trace').checked;changed();});
+on('d-en-trace','change',()=>{S.en.trace=$('d-en-trace').checked;changed();});
+on('d-ko-story','change',()=>{S.ko.storyId=$('d-ko-story').value;S.ko.page=0;changed();});
+on('d-en-story','change',()=>{S.en.storyId=$('d-en-story').value;S.en.page=0;changed();});
+on('d-ko-page','change',()=>{S.ko.page=+$('d-ko-page').value;changed();});
+on('d-en-page','change',()=>{S.en.page=+$('d-en-page').value;changed();});
+on('d-ma-l1','change',()=>{S.ma.l1=$('d-ma-l1').value;mathHtml=null;changed();});
+on('d-ma-l2','change',()=>{S.ma.l2=$('d-ma-l2').value;mathHtml=null;changed();});
+on('d-refresh','click',()=>{mathHtml=null;changed();});
+
+function setStatus(t,err){const s=$('d-status');s.textContent=t||'';s.classList.toggle('err',!!err);}
+function dayLabelKo(){return '오늘의 한 장 · Day '+S.day;}
+
+/* ---- build today's packet ---- */
+async function render(){
+  const tok={};render.tok=tok;
+  const items=[];
+  $('d-en-story').disabled=S.en.mode==='alpha';
+  if(S.ko.on){
+    const p=KMOM_KO.plan({storyId:S.ko.storyId,name:S.name,aechin:true,cols:S.ko.cols,trace:S.ko.trace,paper:S.paper});
+    plans.ko=p;if(S.ko.page>=p.total)S.ko.page=p.total-1;
+    fillSelect($('d-ko-page'),Array.from({length:p.total},(_,i)=>({v:i,t:(i+1)+' / '+p.total+'장'})),S.ko.page);
+    items.push({html:p.page(S.ko.page,dayLabelKo())});
+  }
+  if(S.en.on){
+    const p=await KMOM_EN.plan({mode:S.en.mode,ecase:'lower',storyId:S.en.storyId,name:S.ename,style:S.en.style,size:S.en.size,rep:1,paper:S.paper,trace:S.en.trace});
+    if(render.tok!==tok)return;
+    plans.en=p;if(S.en.page>=p.total)S.en.page=p.total-1;
+    fillSelect($('d-en-page'),Array.from({length:p.total},(_,i)=>({v:i,t:'Page '+(i+1)+' / '+p.total})),S.en.page);
+    items.push({make:()=>p.page(S.en.page,'Daily Page · Day '+S.day)});
+  }
+  if(S.ma.on){
+    if(!mathHtml)mathHtml=KMOM_MATH.sheetHtml({picked:[S.ma.l1,S.ma.l2].filter(Boolean),ratio:50,format:S.ma.format,count:S.ma.count,locale:S.ma.locale,paper:S.paper,dayLabel:'Day '+S.day});
+    items.push({html:mathHtml});
+  }
+  pages=items;save();summary();
+  if(cur>=pages.length)cur=0;
+  showPage();
+}
+function summary(){
+  $('d-day').textContent='Day '+S.day;
+  $('d-last').textContent=S.last?'마지막 저장 '+S.last:'';
+  const parts=[];
+  if(S.ko.on&&plans.ko)parts.push('한글: '+plans.ko.title+' '+(S.ko.page+1)+'/'+plans.ko.total+'장');
+  if(S.en.on&&plans.en)parts.push('영어: '+plans.en.title+' '+(S.en.page+1)+'/'+plans.en.total);
+  if(S.ma.on)parts.push('수학: '+[S.ma.l1,S.ma.l2].filter(Boolean).join(' + '));
+  $('d-summary').textContent=parts.length?'오늘: '+parts.join(' · '):'포함할 학습지를 하나 이상 고르세요.';
+  $('d-make').disabled=!parts.length;
+  $('d-undo').disabled=!S.prev;
+}
+function toEl(it){if(it.make)return it.make();const d=document.createElement('div');d.innerHTML=it.html;return d.firstElementChild;}
+function showPage(){
+  const stage=$('d-stage');const total=pages.length;
+  if(!total){stage.innerHTML='<div class="empty">포함할 학습지를 하나 이상 고르세요.</div>';$('d-pageinfo').textContent='0 / 0';$('d-prev').disabled=$('d-nextp').disabled=true;return;}
+  if(stage.clientWidth<80)return;
+  cur=Math.max(0,Math.min(total-1,cur));
+  const W=S.paper==='a4'?794:816,H=S.paper==='a4'?1123:1056;const w=Math.min(W,stage.clientWidth-40);const sc=w/W;
+  stage.innerHTML='';const wrap=document.createElement('div');wrap.className='paper-wrap';wrap.style.width=Math.round(W*sc)+'px';wrap.style.height=Math.round(H*sc)+'px';
+  const el=toEl(pages[cur]);el.style.transform='scale('+sc+')';wrap.appendChild(el);stage.appendChild(wrap);
+  $('d-pageinfo').textContent=(cur+1)+' / '+total;$('d-prev').disabled=cur===0;$('d-nextp').disabled=cur===total-1;
+}
+on('d-prev','click',()=>{cur--;showPage();});
+on('d-nextp','click',()=>{cur++;showPage();});
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(showPage,120);});
+function changed(){save();render();}
+
+/* ---- progress ---- */
+function advance(){
+  const snap=clone(S);snap.prev=null;S.prev=snap;
+  if(S.ko.on&&plans.ko){S.ko.page++;if(S.ko.page>=plans.ko.total){const L=KMOM_KO.stories;const i=L.findIndex(s=>s.id===S.ko.storyId);S.ko.storyId=L[(i+1)%L.length].id;S.ko.page=0;$('d-ko-story').value=S.ko.storyId;}}
+  if(S.en.on&&plans.en){S.en.page++;if(S.en.page>=plans.en.total){S.en.page=0;if(S.en.mode==='story'){const L=KMOM_EN.stories;const i=L.findIndex(s=>s.id===S.en.storyId);S.en.storyId=L[(i+1)%L.length].id;$('d-en-story').value=S.en.storyId;}}}
+  S.day++;mathHtml=null;cur=0;
+}
+on('d-next','click',()=>{advance();changed();setStatus('Day '+S.day+'로 넘어갔어요.');});
+on('d-undo','click',()=>{if(!S.prev)return;S=Object.assign(S.prev,{prev:null});
+  $('d-ko-story').value=S.ko.storyId;$('d-en-story').value=S.en.storyId;mathHtml=null;cur=0;changed();setStatus('하루 되돌렸어요.');});
+
+/* ---- PDF ---- */
+on('d-make','click',async()=>{
+  if(busy||!pages.length)return;
+  if(!window.html2canvas||!window.jspdf){setStatus('PDF 도구를 불러오지 못했어요. 새로 고친 뒤 다시 시도하세요.',true);return;}
+  busy=true;const btn=$('d-make');btn.disabled=true;
+  try{
+    try{await document.fonts.ready;}catch(e){}
+    const P=S.paper==='a4'?{pdf:'a4',pw:595.28,ph:841.89}:{pdf:'letter',pw:612,ph:792};
+    const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:'pt',format:P.pdf,orientation:'portrait',compress:true});
+    const holder=$('d-render-stage');
+    for(let i=0;i<pages.length;i++){
+      setStatus('PDF 만드는 중… '+(i+1)+' / '+pages.length);
+      holder.innerHTML='';const el=toEl(pages[i]);holder.appendChild(el);
+      const canvas=await window.html2canvas(el,{scale:2,backgroundColor:'#ffffff',logging:false});
+      if(i>0)pdf.addPage(P.pdf,'portrait');
+      pdf.addImage(canvas.toDataURL('image/jpeg',0.9),'JPEG',0,0,P.pw,P.ph,undefined,'FAST');canvas.width=canvas.height=0;
+    }
+    holder.innerHTML='';
+    const today=new Date();const ds=(today.getMonth()+1)+'-'+today.getDate();
+    await DL.save({filename:'오늘의한장_Day'+S.day+'_'+ds+'.pdf',data:pdf.output('blob')});
+    S.last=today.toLocaleDateString('ko-KR');
+    const done=S.day;advance();changed();
+    setStatus('Day '+done+' PDF를 저장했어요. 내일은 Day '+S.day+'로 이어져요.');
+  }catch(e){setStatus('PDF를 저장하지 못했어요. 다시 시도하세요.',true);}
+  finally{busy=false;btn.disabled=false;}
+});
+
+const startDaily=()=>render();
+if(document.fonts&&document.fonts.load){document.fonts.load('40px Andika').then(startDaily,startDaily);}else startDaily();
 })();
 </script>
 </body>
