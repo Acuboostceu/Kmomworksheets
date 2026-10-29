@@ -1,0 +1,7 @@
+{
+  "name": "learning-sheets",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Free printable math worksheets and Korean handwriting practice notes",
+  "engines": { "node": ">=18" }
+}

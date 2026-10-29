@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>우리 아이 학습지 — 연산지 · 글씨 연습</title>
+<title>우리 아이 학습지 — 연산지 · 한글 · English</title>
 <meta name="description" content="무료 초등 연산지 생성기와 아이 이름으로 만드는 한글 글씨 연습장. Letter·A4 PDF로 저장해 인쇄하세요.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✏️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -148,13 +148,25 @@ textarea.text{min-height:180px;resize:vertical;font-family:'Gowun Dodum','Noto S
 .gc .pt{position:absolute;left:18%;bottom:12%}
 .gr.practice .gc span{color:#C9CFD8}
 
+/* ---- english tab ---- */
+#e-render-stage{position:fixed;left:-20000px;top:0;width:820px;pointer-events:none}
+.paper-wrap>.esheet{position:absolute;top:0;left:0;transform-origin:top left}
+.esheet{background:#fff;color:#1A1A1A;font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;box-sizing:border-box;padding:44px 52px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.esheet *{box-sizing:border-box}
+.esheet .s-h1{font-size:26px;line-height:1.25;font-family:Andika,'Noto Sans KR',sans-serif}
+.esheet canvas{display:block}
+textarea.text.en{font-family:Andika,system-ui,sans-serif}
+.ai-box{border:1px solid var(--line);border-radius:12px;padding:0 14px}
+.ai-box summary{min-height:48px;display:flex;align-items:center;cursor:pointer;font-weight:700}
+.ai-in{display:flex;flex-direction:column;gap:10px;padding-bottom:14px}
+
 /* ---- site nav ---- */
 .site{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
 .site-in{max-width:1240px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .brand{font-weight:900;font-size:18px;margin-right:auto}
 .tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}
-.tabs a{display:flex;align-items:center;min-height:40px;padding:0 16px;border-radius:9px;text-decoration:none;color:var(--muted);font-weight:700}
+.tabs a{display:flex;align-items:center;min-height:40px;padding:0 14px;white-space:nowrap;border-radius:9px;text-decoration:none;color:var(--muted);font-weight:700}
 .tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:0 0 0 1px var(--line)}
 .tab-sec[hidden]{display:none}
 .foot{max-width:1240px;margin:0 auto;padding:0 20px 32px;color:var(--muted);font-size:13px}
@@ -167,6 +179,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <div class="tabs">
       <a href="#math" data-tab="math">수학 연산지</a>
       <a href="#hangul" data-tab="hangul">한글 글씨 연습</a>
+      <a href="#english" data-tab="english">English</a>
     </div>
   </div>
 </nav>
@@ -247,27 +260,18 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 <section class="tab-sec" id="sec-hangul" aria-label="한글 글씨 연습" hidden>
 <header class="top">
   <h1>이야기 글씨 연습장</h1>
-  <p>아이 이름으로 짧은 이야기를 만들고, 칸 노트에 한 줄씩 옮겨 써 보는 연습장이에요.</p>
+  <p>아이 이름이 들어간 이야기를 칸 노트에 한 줄씩 옮겨 써 보는 연습장이에요. 긴 이야기는 여러 장으로 나뉘어요.</p>
 </header>
 <main class="layout">
-  <section class="panel" aria-label="설정">
-    <div class="row2">
-      <div>
-        <label class="lbl" for="name" style="display:block">아이 이름</label>
-        <input class="text" id="name" type="text" maxlength="10" placeholder="예: 서윤" autocomplete="off">
-      </div>
-      <div>
-        <label class="lbl" for="topic" style="display:block">이야기 주제 <span class="hint" style="font-weight:400">(선택)</span></label>
-        <input class="text" id="topic" type="text" maxlength="40" placeholder="예: 공룡, 바다, 생일" autocomplete="off">
-      </div>
+  <section class="panel" aria-label="한글 연습장 설정">
+    <div>
+      <label class="lbl" for="name" style="display:block">아이 이름</label>
+      <input class="text" id="name" type="text" maxlength="10" placeholder="예: 서윤" autocomplete="off">
+      <label class="switch" style="margin-top:6px"><input type="checkbox" id="aechin" checked> 받침 있는 이름은 ‘서윤이는’처럼 부르기</label>
     </div>
     <fieldset>
-      <legend>난이도</legend>
-      <div class="seg" role="group" aria-label="난이도">
-        <button type="button" data-lv="1" aria-pressed="true">1학년</button>
-        <button type="button" data-lv="2" aria-pressed="false">2학년</button>
-        <button type="button" data-lv="3" aria-pressed="false">3학년</button>
-      </div>
+      <legend>이야기 고르기</legend>
+      <div class="levels" id="k-list"></div>
     </fieldset>
     <fieldset>
       <legend>한 줄 칸 수</legend>
@@ -277,14 +281,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <button type="button" data-cols="12" aria-pressed="false">12칸</button>
         <button type="button" data-cols="15" aria-pressed="false">15칸</button>
       </div>
-      <p class="hint" id="capHint"></p>
     </fieldset>
     <div class="row2">
       <fieldset>
-        <legend>분량</legend>
-        <div class="seg" role="group" aria-label="분량">
-          <button type="button" data-pages="1" aria-pressed="true">1장</button>
-          <button type="button" data-pages="2" aria-pressed="false">2장</button>
+        <legend>쓰는 줄</legend>
+        <div class="seg" role="group" aria-label="쓰는 줄">
+          <button type="button" data-trace="0" aria-pressed="true">빈칸</button>
+          <button type="button" data-trace="1" aria-pressed="false">연한 글씨</button>
         </div>
       </fieldset>
       <fieldset>
@@ -295,23 +298,29 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         </div>
       </fieldset>
     </div>
-    <fieldset>
-      <legend>쓰는 줄</legend>
-      <div class="seg" role="group" aria-label="쓰는 줄">
-        <button type="button" data-trace="0" aria-pressed="true">빈칸</button>
-        <button type="button" data-trace="1" aria-pressed="false">연한 글씨 따라 쓰기</button>
-      </div>
-    </fieldset>
-    <button class="primary" id="make" type="button">이야기 만들기</button>
+    <label class="switch"><input type="checkbox" id="k-sentnl"> 문장마다 새 줄에서 시작</label>
     <div class="story-box">
       <label class="lbl" for="story" style="margin:0">이야기 <span class="hint" style="font-weight:400">— 직접 쓰거나 고칠 수 있어요</span></label>
       <input class="text" id="title" type="text" maxlength="30" placeholder="제목">
-      <textarea class="text" id="story" placeholder="이야기 만들기를 누르거나, 여기에 직접 써 넣으세요."></textarea>
+      <textarea class="text" id="story" placeholder="위에서 이야기를 고르거나, 여기에 직접 써 넣으세요."></textarea>
       <p class="hint" id="k-countHint"></p>
     </div>
+    <details class="ai-box">
+      <summary>AI로 새 이야기 만들기 (선택)</summary>
+      <div class="ai-in">
+        <input class="text" id="topic" type="text" maxlength="40" placeholder="주제 예: 공룡, 바다, 생일" autocomplete="off">
+        <div class="seg" role="group" aria-label="학년">
+          <button type="button" data-lv="1" aria-pressed="true">1학년</button>
+          <button type="button" data-lv="2" aria-pressed="false">2학년</button>
+          <button type="button" data-lv="3" aria-pressed="false">3학년</button>
+        </div>
+        <button class="secondary" id="make" type="button">AI로 만들기</button>
+        <p class="hint">서버에 AI 키가 설정된 경우에만 작동해요. AI가 쓴 글은 인쇄 전에 꼭 읽어 봐 주세요.</p>
+      </div>
+    </details>
   </section>
 
-  <section class="preview" aria-label="미리보기">
+  <section class="preview" aria-label="한글 연습장 미리보기">
     <div class="bar">
       <div class="pager">
         <button type="button" id="k-prev" aria-label="이전 장"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -321,14 +330,78 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <button class="secondary" id="k-pdf" type="button" disabled>PDF 저장</button>
     </div>
     <div class="status" id="k-status" role="status" aria-live="polite"></div>
-    <div class="stage" id="k-stage"><div class="empty">아이 이름을 넣고 이야기 만들기를 누르세요.</div></div>
+    <div class="stage" id="k-stage"><div class="empty">이야기를 고르세요.</div></div>
   </section>
 </main>
 </section>
 
-<footer class="foot">무료로 쓰는 학습지예요. 이야기는 AI가 만들기 때문에 인쇄 전에 한 번 읽어 봐 주세요.</footer>
+<section class="tab-sec" id="sec-english" aria-label="English handwriting" hidden>
+<header class="top">
+  <h1>English Handwriting</h1>
+  <p>Copy each line onto the ruled lines below it. Pick a short story or paste your own text.</p>
+</header>
+<main class="layout">
+  <section class="panel" aria-label="English handwriting settings">
+    <div>
+      <label class="lbl" for="e-name" style="display:block">Child’s name</label>
+      <input class="text" id="e-name" type="text" maxlength="16" placeholder="e.g. Emma" autocomplete="off">
+    </div>
+    <fieldset>
+      <legend>Story</legend>
+      <div class="levels" id="e-list"></div>
+    </fieldset>
+    <fieldset>
+      <legend>Line size</legend>
+      <div class="seg" role="group" aria-label="Line size">
+        <button type="button" data-esize="L" aria-pressed="true">Large (K)</button>
+        <button type="button" data-esize="M" aria-pressed="false">Medium (1–2)</button>
+        <button type="button" data-esize="S" aria-pressed="false">Small (3+)</button>
+      </div>
+    </fieldset>
+    <div class="row2">
+      <fieldset>
+        <legend>Practice lines</legend>
+        <div class="seg" role="group" aria-label="Practice lines per model line">
+          <button type="button" data-erep="1" aria-pressed="true">1</button>
+          <button type="button" data-erep="2" aria-pressed="false">2</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Paper</legend>
+        <div class="seg" role="group" aria-label="Paper size">
+          <button type="button" data-epaper="letter" aria-pressed="true">Letter</button>
+          <button type="button" data-epaper="a4" aria-pressed="false">A4</button>
+        </div>
+      </fieldset>
+    </div>
+    <label class="switch"><input type="checkbox" id="e-trace"> Light gray letters to trace on the first practice line</label>
+    <div class="story-box">
+      <label class="lbl" for="e-text" style="margin:0">Text <span class="hint" style="font-weight:400">— edit or paste your own</span></label>
+      <input class="text" id="e-title" type="text" maxlength="40" placeholder="Title">
+      <textarea class="text en" id="e-text" placeholder="Pick a story above or type here. Each line starts a new model line."></textarea>
+      <p class="hint" id="e-countHint"></p>
+    </div>
+  </section>
+
+  <section class="preview" aria-label="English handwriting preview">
+    <div class="bar">
+      <div class="pager">
+        <button type="button" id="e-prev" aria-label="Previous page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <span id="e-pageinfo">0 / 0</span>
+        <button type="button" id="e-next" aria-label="Next page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+      <button class="secondary" id="e-pdf" type="button" disabled>Save PDF</button>
+    </div>
+    <div class="status" id="e-status" role="status" aria-live="polite"></div>
+    <div class="stage" id="e-stage"><div class="empty">Pick a story to start.</div></div>
+  </section>
+</main>
+</section>
+
+<footer class="foot">무료로 쓰는 학습지예요. 이야기는 전래동화와 이솝 우화 줄거리를 바탕으로 새로 쓴 글이에요.</footer>
 <div id="render-stage" aria-hidden="true"></div>
 <div id="k-render-stage" aria-hidden="true"></div>
+<div id="e-render-stage" aria-hidden="true"></div>
 
 <script>
 /* shared: plain browser download */
@@ -340,9 +413,8 @@ const DL={save:async({filename,data})=>{
 /* tabs (hash routing) */
 (function(){
   function show(){
-    const t=location.hash==='#hangul'?'hangul':'math';
-    document.getElementById('sec-math').hidden=t!=='math';
-    document.getElementById('sec-hangul').hidden=t!=='hangul';
+    const t=location.hash==='#hangul'?'hangul':(location.hash==='#english'?'english':'math');
+    ['math','hangul','english'].forEach(k=>{document.getElementById('sec-'+k).hidden=t!==k;});
     document.querySelectorAll('[data-tab]').forEach(a=>a.setAttribute('aria-current',a.dataset.tab===t?'page':'false'));
     window.dispatchEvent(new Event('resize'));
   }
@@ -694,35 +766,84 @@ $('pdf').addEventListener('click',async()=>{
 });
 
 renderLevels();renderPicked();renderCounts();
-if(location.hash!=='#hangul')$('gen').click();
+if(!location.hash||location.hash==='#math')$('gen').click();
 })();
 </script>
 <script>
+const KO_STORIES=[
+{id:'k1-01',grade:1,title:'토끼와 거북이',lines:[
+'{N:는} 숲속에 놀러 갔어요.','토끼와 거북이가 달리기 시합을 해요.','토끼는 깡충깡충 빨리 뛰었어요.','거북이는 엉금엉금 천천히 걸었어요.','토끼는 나무 밑에서 잠이 들었어요.','거북이는 쉬지 않고 걸었어요.','{N:는} 거북이를 응원했어요.','거북아, 힘내!','거북이가 먼저 도착했어요.','토끼는 깜짝 놀랐어요.','{N:는} 생각했어요.','천천히 가도 꾸준히 가면 돼.']},
+{id:'k1-02',grade:1,title:'해님과 바람',lines:[
+'{N:는} 언덕에 올라갔어요.','하늘에서 해님과 바람이 내기를 해요.','누가 나그네의 외투를 벗길까?','바람이 먼저 휘잉휘잉 불었어요.','나그네는 외투를 꼭 잡았어요.','바람이 더 세게 불었어요.','나그네는 외투를 더 꼭 여몄어요.','이번에는 해님 차례예요.','해님이 따뜻하게 웃었어요.','나그네는 땀을 닦았어요.','그리고 외투를 벗었어요.','{N:는} 손뼉을 쳤어요.','따뜻한 마음이 바람보다 힘이 세요.']},
+{id:'k1-03',grade:1,title:'개미와 베짱이',lines:[
+'여름이 되었어요.','{N:는} 들판에서 개미를 보았어요.','개미는 땀을 흘리며 먹이를 날랐어요.','베짱이는 나무 그늘에서 노래만 불렀어요.','개미야, 같이 놀자.','나는 겨울 준비를 해야 해.','가을이 가고 겨울이 왔어요.','눈이 펑펑 내렸어요.','베짱이는 춥고 배가 고팠어요.','베짱이가 개미네 문을 두드렸어요.','개미는 문을 열어 주었어요.','따뜻한 수프도 나누어 주었어요.','{N:는} 미리 준비하는 개미가 멋져 보였어요.']},
+{id:'k1-04',grade:1,title:'금도끼 은도끼',lines:[
+'옛날에 착한 나무꾼이 살았어요.','나무꾼은 연못가에서 나무를 했어요.','그런데 도끼가 퐁당 빠졌어요.','연못에서 산신령이 나왔어요.','이 금도끼가 네 도끼냐?','아니요, 제 도끼가 아니에요.','이 은도끼가 네 도끼냐?','아니요, 제 도끼는 쇠도끼예요.','산신령은 빙그레 웃었어요.','정직한 나무꾼에게 도끼를 모두 주었어요.','{N:는} 이 이야기를 듣고 말했어요.','나도 늘 정직하게 말할래요.']},
+{id:'k1-05',grade:1,title:'사자와 생쥐',lines:[
+'사자가 낮잠을 자고 있었어요.','생쥐가 사자 코 위를 지나갔어요.','사자가 눈을 번쩍 떴어요.','사자님, 살려 주세요.','언젠가 꼭 은혜를 갚을게요.','사자는 생쥐를 놓아주었어요.','며칠 뒤 사자가 그물에 걸렸어요.','생쥐가 달려와 그물을 갉았어요.','사자는 그물에서 나왔어요.','고마워, 작은 친구야.','{N:는} 그림책을 덮으며 웃었어요.','작은 친구도 큰 도움을 줄 수 있어요.']},
+{id:'k1-06',grade:1,title:'시골 쥐와 도시 쥐',lines:[
+'시골 쥐가 도시 쥐네 집에 갔어요.','도시 쥐네 집에는 맛있는 음식이 많았어요.','치즈도 있고 빵도 있었어요.','둘이 먹으려는데 고양이가 왔어요.','시골 쥐와 도시 쥐는 깜짝 놀라 숨었어요.','고양이가 가고 다시 먹으려는데 사람이 왔어요.','둘은 또 숨었어요.','시골 쥐는 집에 가기로 했어요.','나는 조용한 시골이 좋아.','{N:는} 이야기를 듣고 생각했어요.','우리 집이 제일 편해요.']},
+{id:'k1-07',grade:1,title:'여우와 두루미',lines:[
+'여우가 두루미를 집에 불렀어요.','여우는 넓은 접시에 수프를 주었어요.','두루미는 부리가 길어서 먹을 수 없었어요.','다음 날 두루미가 여우를 불렀어요.','두루미는 목이 긴 병에 음식을 주었어요.','이번에는 여우가 먹을 수 없었어요.','여우는 얼굴이 빨개졌어요.','미안해, 두루미야.','두루미도 웃으며 말했어요.','이제 같이 먹자.','{N:는} 친구를 생각했어요.','친구가 좋아하는 것을 준비할래요.']},
+{id:'k1-08',grade:1,title:'목마른 까마귀',lines:[
+'까마귀가 목이 말랐어요.','물병을 찾았지만 물이 조금밖에 없었어요.','부리가 물에 닿지 않았어요.','까마귀는 곰곰이 생각했어요.','작은 돌을 하나 물어 왔어요.','돌을 병에 퐁당 넣었어요.','하나, 둘, 셋, 넷.','물이 조금씩 올라왔어요.','드디어 물을 마셨어요.','{N:는} 손뼉을 쳤어요.','까마귀야, 정말 똑똑하구나!','어려울 때는 천천히 생각해 보면 돼요.']},
+{id:'k1-09',grade:1,title:'견우와 직녀',lines:[
+'하늘 나라에 직녀가 살았어요.','직녀는 옷감을 잘 짰어요.','소를 모는 견우도 살았어요.','견우와 직녀는 서로 좋아했어요.','그런데 둘은 일을 하지 않았어요.','임금님은 둘을 멀리 떨어뜨렸어요.','둘은 은하수 건너편에서 울었어요.','까치와 까마귀가 날아왔어요.','새들이 모여 다리를 만들었어요.','견우와 직녀는 일 년에 한 번 만나요.','{N:는} 밤하늘을 올려다보았어요.','반짝이는 은하수가 보였어요.']},
+{id:'k1-10',grade:1,title:'흥부와 제비',lines:[
+'흥부는 마음씨가 착했어요.','어느 날 제비가 다리를 다쳤어요.','흥부는 제비 다리를 정성껏 감아 주었어요.','제비는 다 나아서 남쪽으로 날아갔어요.','봄이 되자 제비가 돌아왔어요.','제비는 박씨 하나를 떨어뜨렸어요.','흥부는 박씨를 심었어요.','커다란 박이 주렁주렁 열렸어요.','박을 타니 쌀과 보물이 쏟아졌어요.','흥부네 가족은 기뻐서 춤을 추었어요.','{N:는} 다친 새를 보면 도와주기로 했어요.']}
+];
+
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
 const PAPER={letter:{w:816,h:1056,pdf:'letter',pw:612,ph:792},a4:{w:794,h:1123,pdf:'a4',pw:595.28,ph:841.89}};
-const state={lv:1,cols:10,pages:1,paper:'letter',trace:false,sheets:[],cur:0};
+const state={lv:1,cols:10,paper:'letter',trace:false,storyId:KO_STORIES[0].id,dirty:false,sheets:[],cur:0};
 const PG=()=>PAPER[state.paper];
 const PUNCT=new Set(['.',',','!','?']);
 
+/* ---- name + particles ---- */
+function hasBatchim(s){if(!s)return false;const c=s.charCodeAt(s.length-1);if(c<0xAC00||c>0xD7A3)return false;return (c-0xAC00)%28!==0;}
+const JOSA={'가':['이','가'],'는':['은','는'],'를':['을','를'],'와':['과','와']};
+function renderTpl(tpl){
+  const n=$('name').value.trim()||'친구';
+  const b=hasBatchim(n);
+  const call=($('aechin').checked&&b)?n+'이':n;
+  return tpl.replace(/\{N(?::([^}]+))?\}/g,(m,p)=>{
+    if(!p)return call;
+    if(p==='야')return n+(b?'아':'야');
+    if(JOSA[p])return call+(hasBatchim(call)?JOSA[p][0]:JOSA[p][1]);
+    return call+p;
+  });
+}
+function loadStory(){
+  const s=KO_STORIES.find(x=>x.id===state.storyId);if(!s)return;
+  $('title').value=s.title;
+  $('story').value=s.lines.map(renderTpl).join('\n');
+  state.dirty=false;build();
+}
+
+/* ---- story list ---- */
+function renderList(){
+  const box=$('k-list');box.innerHTML='';
+  KO_STORIES.forEach(s=>{
+    const b=document.createElement('button');b.type='button';b.className='lv';
+    b.setAttribute('aria-pressed',s.id===state.storyId?'true':'false');
+    b.innerHTML='<span class="code">'+s.grade+'학년</span><span class="name">'+s.title+'</span><span class="ex">'+s.lines.length+'문장</span>';
+    b.addEventListener('click',()=>{state.storyId=s.id;state.cur=0;renderList();loadStory();});
+    box.appendChild(b);
+  });
+}
+
+/* ---- layout ---- */
 function geom(){
   const W=PG().w,H=PG().h;
-  const inner=W-104;
-  const cell=Math.min(78,Math.floor(inner/state.cols));
+  const cell=Math.min(78,Math.floor((W-104)/state.cols));
   const gap=Math.round(cell*0.22);
   const avail=H-88-104;
   const pairs=Math.max(1,Math.floor((avail+gap)/(cell*2+gap)));
   return {cell,gap,pairs};
 }
-function capacity(){const g=geom();return {lines:g.pairs*state.pages,chars:g.pairs*state.pages*state.cols,pairs:g.pairs};}
-function updateCapHint(){
-  const c=capacity();
-  $('capHint').textContent='한 장에 '+c.pairs+'줄씩 써요. '+state.pages+'장이면 이야기 '+c.lines+'줄, 최대 약 '+c.chars+'칸이에요.';
-}
-
-/* --- line breaking: words stay whole, punctuation sits in its own cell --- */
-function wrap(text,N){
+function wrapText(text,N){
   const words=text.replace(/\s+/g,' ').trim().split(' ').filter(Boolean);
   const lines=[];let line=[];
   for(const w of words){
@@ -737,49 +858,41 @@ function wrap(text,N){
   if(line.length)lines.push(line);
   return lines;
 }
-function storyText(){return $('story').value.split(/\n+/).map(s=>s.trim()).filter(Boolean).join(' ');}
-
+function allLines(){
+  const N=state.cols;
+  const paras=$('story').value.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  if($('k-sentnl').checked){let out=[];paras.forEach(p=>{out=out.concat(wrapText(p,N));});return out;}
+  return wrapText(paras.join(' '),N);
+}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function cellHtml(ch,size){
-  const fs=Math.round(size*0.66);
-  let inner='';
-  if(ch&&ch!==' '){inner=PUNCT.has(ch)?'<span class="pt" style="font-size:'+fs+'px">'+esc(ch)+'</span>':'<span style="font-size:'+fs+'px">'+esc(ch)+'</span>';}
+  const fs=Math.round(size*0.66);let inner='';
+  if(ch&&ch!==' ')inner=PUNCT.has(ch)?'<span class="pt" style="font-size:'+fs+'px">'+esc(ch)+'</span>':'<span style="font-size:'+fs+'px">'+esc(ch)+'</span>';
   return '<div class="gc" style="width:'+size+'px;height:'+size+'px"><i class="h"></i><i class="v"></i>'+inner+'</div>';
 }
-function rowHtml(chars,cls,size,N){
-  let h='<div class="gr '+cls+'">';
-  for(let i=0;i<N;i++)h+=cellHtml(chars?chars[i]:'',size);
-  return h+'</div>';
-}
+function rowHtml(chars,cls,size,N){let h='<div class="gr '+cls+'">';for(let i=0;i<N;i++)h+=cellHtml(chars?chars[i]:'',size);return h+'</div>';}
 function build(){
-  const N=state.cols;const g=geom();
-  const lines=wrap(storyText(),N);
-  const needPages=Math.max(1,Math.ceil(lines.length/g.pairs));
-  const total=Math.max(state.pages,needPages);
+  const N=state.cols,g=geom();const lines=allLines();
+  const total=Math.max(1,Math.ceil(lines.length/g.pairs));
   const title=$('title').value.trim()||'이야기 글씨 연습';
   const sheets=[];
   for(let p=0;p<total;p++){
     let grid='';
-    for(let r=0;r<g.pairs;r++){
-      const ln=lines[p*g.pairs+r]||null;
-      grid+='<div style="margin-top:'+(r?g.gap:0)+'px">'+rowHtml(ln,'story',g.cell,N)+rowHtml(state.trace?ln:null,'practice',g.cell,N)+'</div>';
-    }
+    for(let r=0;r<g.pairs;r++){const ln=lines[p*g.pairs+r]||null;
+      grid+='<div style="margin-top:'+(r?g.gap:0)+'px">'+rowHtml(ln,'story',g.cell,N)+rowHtml(state.trace?ln:null,'practice',g.cell,N)+'</div>';}
     sheets.push('<div class="ksheet" style="width:'+PG().w+'px;height:'+PG().h+'px"><div class="s-head"><div class="s-title"><div class="s-code">글씨 연습 · '+(p+1)+' / '+total+'</div><h2 class="s-h1">'+esc(title)+'</h2></div>'+
-      '<div class="s-fields"><div class="s-field"><span>이름</span><span class="s-line"></span></div><div class="s-field"><span>날짜</span><span class="s-line"></span></div></div></div>'+
-      '<div class="grid">'+grid+'</div></div>');
+      '<div class="s-fields"><div class="s-field"><span>이름</span><span class="s-line"></span></div><div class="s-field"><span>날짜</span><span class="s-line"></span></div></div></div><div class="grid">'+grid+'</div></div>');
   }
-  state.sheets=sheets;
-  const used=lines.length, cap=g.pairs*total;
-  $('k-countHint').textContent=storyText()?('지금 이야기는 '+used+'줄이에요 (한 줄 '+N+'칸). '+(needPages>state.pages?'분량보다 길어서 '+needPages+'장으로 늘어났어요.':(cap-used>0?'남은 '+(cap-used)+'줄은 빈 연습 줄로 둬요.':''))):'';
-  showPage();
-  $('k-pdf').disabled=!downloads||!storyText();
+  state.sheets=lines.length?sheets:[];
+  $('k-countHint').textContent=lines.length?('이 이야기는 '+lines.length+'줄, '+total+'장이에요 (한 장에 '+g.pairs+'줄).'+(state.dirty?' 직접 고친 내용이라 이름을 바꿔도 자동으로 바뀌지 않아요.':'')):'';
+  showPage();$('k-pdf').disabled=!lines.length;
 }
-
 function showPage(){
   const stage=$('k-stage');const total=state.sheets.length;
-  if(!total||!storyText()){stage.innerHTML='<div class="empty">아이 이름을 넣고 이야기 만들기를 누르세요.</div>';$('k-pageinfo').textContent='0 / 0';$('k-prev').disabled=$('k-next').disabled=true;return;}
+  if(!total){stage.innerHTML='<div class="empty">이야기를 고르거나 직접 써 넣으세요.</div>';$('k-pageinfo').textContent='0 / 0';$('k-prev').disabled=$('k-next').disabled=true;return;}
+  if(stage.clientWidth<80)return;
   state.cur=Math.max(0,Math.min(total-1,state.cur));
-  if(stage.clientWidth<80)return;const W=PG().w,H=PG().h;const w=Math.min(W,stage.clientWidth-40);const sc=w/W;
+  const W=PG().w,H=PG().h;const w=Math.min(W,stage.clientWidth-40);const sc=w/W;
   stage.innerHTML='<div class="paper-wrap" style="width:'+Math.round(W*sc)+'px;height:'+Math.round(H*sc)+'px">'+state.sheets[state.cur]+'</div>';
   stage.querySelector('.ksheet').style.transform='scale('+sc+')';
   $('k-pageinfo').textContent=(state.cur+1)+' / '+total;
@@ -793,42 +906,44 @@ function seg(attr,key,parse){
   document.querySelectorAll('['+attr+']').forEach(b=>b.addEventListener('click',()=>{
     state[key]=parse(b.getAttribute(attr));
     document.querySelectorAll('['+attr+']').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
-    updateCapHint();if(key!=='lv')build();
+    if(key!=='lv')build();
   }));
 }
-seg('data-lv','lv',Number);seg('data-cols','cols',Number);seg('data-pages','pages',Number);seg('data-kpaper','paper',String);seg('data-trace','trace',v=>v==='1');
-let et;['story','title'].forEach(id=>$(id).addEventListener('input',()=>{clearTimeout(et);et=setTimeout(build,250);}));
+seg('data-lv','lv',Number);seg('data-cols','cols',Number);seg('data-kpaper','paper',String);seg('data-trace','trace',v=>v==='1');
+$('k-sentnl').addEventListener('change',build);
+let nt;$('name').addEventListener('input',()=>{clearTimeout(nt);nt=setTimeout(()=>{if(!state.dirty)loadStory();},250);});
+$('aechin').addEventListener('change',()=>{if(!state.dirty)loadStory();});
+let et;$('story').addEventListener('input',()=>{state.dirty=true;clearTimeout(et);et=setTimeout(build,250);});
+$('title').addEventListener('input',()=>{clearTimeout(et);et=setTimeout(build,250);});
 
 function setStatus(t,err){const s=$('k-status');s.textContent=t||'';s.classList.toggle('err',!!err);}
 
-/* --- story generation (Claude) --- */
-const downloads=DL;
-function setManual(msg){setStatus(msg||'이야기 자동 만들기를 쓸 수 없어요. 아래 칸에 이야기를 직접 써 넣으면 연습장이 만들어져요.',true);}
+/* ---- optional AI story ---- */
 $('make').addEventListener('click',async()=>{
   const name=$('name').value.trim();
   if(!name){setStatus('아이 이름을 먼저 넣어 주세요.',true);$('name').focus();return;}
-  const cap=capacity();const target=Math.round(cap.chars*0.78);
+  const g=geom();const target=Math.round(g.pairs*state.cols*2*0.78);
   const btn=$('make');btn.disabled=true;btn.textContent='이야기 쓰는 중…';
   setStatus('이야기를 만들고 있어요. 10~30초쯤 걸려요.');
   try{
     const r=await fetch('/api/story',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,topic:$('topic').value.trim(),lv:state.lv,target})});
-    if(r.status===429){setStatus('오늘 만들 수 있는 이야기 수를 다 썼어요. 내일 다시 시도하거나 직접 써 넣어 주세요.',true);return;}
-    if(!r.ok)throw new Error('http '+r.status);
+    if(r.status===429){setStatus('오늘 만들 수 있는 이야기 수를 다 썼어요.',true);return;}
+    if(!r.ok){let d='';try{d=(await r.json()).detail||'';}catch(_){}throw {detail:d||('http_'+r.status)};}
     const data=await r.json();
     const sents=(Array.isArray(data.sentences)?data.sentences:[]).map(s=>String(s).trim()).filter(Boolean);
-    if(!sents.length)throw new Error('empty');
+    if(!sents.length)throw {detail:'bad_model_output'};
     $('title').value=String(data.title||'').slice(0,30);
-    $('story').value=sents.join('\n');
-    state.cur=0;build();
-    setStatus('이야기를 만들었어요. 마음에 안 들면 다시 누르거나 직접 고쳐 쓰세요.');
+    $('story').value=sents.join('\n');state.dirty=true;state.cur=0;
+    document.querySelectorAll('#k-list .lv').forEach(x=>x.setAttribute('aria-pressed','false'));
+    build();setStatus('AI 이야기를 만들었어요. 인쇄 전에 한 번 읽어 봐 주세요.');
   }catch(e){
-    setManual('이야기를 만들지 못했어요. 잠시 후 다시 누르거나, 아래 칸에 직접 써 넣어 주세요.');
-  }finally{btn.disabled=false;btn.textContent='다시 만들기';}
+    setStatus('AI 이야기를 만들지 못했어요'+(e&&e.detail?' ('+e.detail+')':'')+'. 목록의 이야기를 쓰거나 직접 써 넣어 주세요.',true);
+  }finally{btn.disabled=false;btn.textContent='AI로 만들기';}
 });
 
-/* --- PDF --- */
+/* ---- PDF ---- */
 $('k-pdf').addEventListener('click',async()=>{
-  if(!downloads||!state.sheets.length)return;
+  if(!state.sheets.length)return;
   if(!window.html2canvas||!window.jspdf){setStatus('PDF 도구를 불러오지 못했어요. 새로 고친 뒤 다시 시도하세요.',true);return;}
   const btn=$('k-pdf');btn.disabled=true;
   try{
@@ -846,18 +961,182 @@ $('k-pdf').addEventListener('click',async()=>{
     }
     holder.innerHTML='';
     const nm=($('name').value.trim()||'글씨연습').replace(/[\\/:*?"<>|\s]+/g,'');
-    setStatus('저장 확인을 기다리는 중…');
-    await downloads.save({filename:'글씨연습_'+nm+'_'+state.cols+'칸.pdf',data:pdf.output('blob')});
+    await DL.save({filename:'글씨연습_'+nm+'_'+($('title').value.trim()||'이야기').replace(/[\\/:*?"<>|\s]+/g,'')+'.pdf',data:pdf.output('blob')});
     setStatus('PDF를 저장했어요.');
-  }catch(e){
-    const c=e&&e.code;
-    if(c==='declined')setStatus('저장을 취소했어요.');
-    else if(c==='rate_limited')setStatus('이미 저장 창이 열려 있어요. 잠시 후 다시 시도하세요.',true);
-    else setStatus('PDF를 저장하지 못했어요. 다시 시도하세요.',true);
-  }finally{btn.disabled=false;}
+  }catch(e){setStatus('PDF를 저장하지 못했어요. 다시 시도하세요.',true);}
+  finally{btn.disabled=false;}
 });
 
-updateCapHint();build();
+renderList();loadStory();
+})();
+</script>
+<script>
+const EN_STORIES=[
+{id:'e-01',title:'The Tortoise and the Hare',lines:[
+'{name} went to the park.','A hare and a tortoise had a race.','The hare ran very fast.','The tortoise walked slowly.','The hare took a nap under a tree.','The tortoise did not stop.','{name} cheered for the tortoise.','The tortoise won the race!','Slow and steady wins the race.']},
+{id:'e-02',title:'The Lion and the Mouse',lines:[
+'A big lion was sleeping.','A little mouse ran over his nose.','The lion woke up.','Please let me go, said the mouse.','I will help you one day.','The lion let the mouse go.','Later the lion was caught in a net.','The mouse chewed the net.','The lion was free!','{name} smiled at the end of the story.','Little friends can be big helpers.']},
+{id:'e-03',title:'The Ant and the Grasshopper',lines:[
+'It was a hot summer day.','{name} saw an ant carrying food.','A grasshopper sang and played all day.','The ant kept working.','Then winter came.','The grasshopper was cold and hungry.','The kind ant shared her food.','{name} wants to plan ahead like the ant.']},
+{id:'e-04',title:'The Crow and the Pitcher',lines:[
+'A crow was very thirsty.','She found a pitcher with a little water.','Her beak could not reach it.','The crow had an idea.','She dropped in one stone.','Then two, three, and four stones.','The water came up and up.','The crow got a big drink!','{name} clapped. What a smart bird!']},
+{id:'e-05',title:'The Wind and the Sun',lines:[
+'The wind and the sun had a contest.','Who can take off the coat of a man?','The wind blew and blew.','The man held his coat tight.','Then the sun smiled warm and bright.','The man felt hot.','He took off his coat.','{name} learned that kindness is strong.']},
+{id:'e-06',title:'The Fox and the Stork',lines:[
+'The fox asked the stork to lunch.','He gave her soup in a flat dish.','The stork could not eat it.','Then the stork asked the fox to lunch.','She gave him food in a tall jar.','The fox could not eat it.','The fox said sorry.','Now they share food that both can eat.','{name} thinks about what friends like.']}
+];
+
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const PAPER={letter:{w:816,h:1056,pdf:'letter',pw:612,ph:792},a4:{w:794,h:1123,pdf:'a4',pw:595.28,ph:841.89}};
+const SIZE={L:48,M:38,S:28};
+const FONT="Andika, 'Comic Sans MS', 'Trebuchet MS', sans-serif";
+const state={storyId:EN_STORIES[0].id,size:'L',rep:1,paper:'letter',dirty:false,pages:[],cur:0,xRatio:0.5};
+const PG=()=>PAPER[state.paper];
+const mctx=document.createElement('canvas').getContext('2d');
+
+function fill(t){return t.replace(/\{name\}/g,$('e-name').value.trim()||'Sam');}
+function loadStory(){
+  const s=EN_STORIES.find(x=>x.id===state.storyId);if(!s)return;
+  $('e-title').value=s.title;$('e-text').value=s.lines.map(fill).join('\n');state.dirty=false;build();
+}
+function renderList(){
+  const box=$('e-list');box.innerHTML='';
+  EN_STORIES.forEach(s=>{
+    const b=document.createElement('button');b.type='button';b.className='lv';
+    b.setAttribute('aria-pressed',s.id===state.storyId?'true':'false');
+    b.innerHTML='<span class="code">K–2</span><span class="name">'+s.title+'</span><span class="ex">'+s.lines.length+' lines</span>';
+    b.addEventListener('click',()=>{state.storyId=s.id;state.cur=0;renderList();loadStory();});
+    box.appendChild(b);
+  });
+}
+
+function geom(){
+  const u=SIZE[state.size];
+  const rh=Math.round(u*1.5), rowGap=Math.round(u*0.22), groupGap=Math.round(u*0.45);
+  const W=PG().w,H=PG().h;
+  const cw=W-104, ch=H-88-92;
+  const groupH=(1+state.rep)*rh+state.rep*rowGap;
+  const groups=Math.max(1,Math.floor((ch+groupGap)/(groupH+groupGap)));
+  const fs=Math.round((u*0.5)/state.xRatio);
+  return {u,rh,rowGap,groupGap,groupH,groups,cw,ch,fs};
+}
+function measureFont(){
+  mctx.font='100px '+FONT;
+  const m=mctx.measureText('x');
+  const r=(m.actualBoundingBoxAscent||50)/100;
+  state.xRatio=(r>0.3&&r<0.7)?r:0.5;
+}
+function wrap(text,maxW,fs){
+  mctx.font=fs+'px '+FONT;
+  const out=[];
+  text.split(/\n+/).map(s=>s.trim()).filter(Boolean).forEach(p=>{
+    let line='';
+    p.split(/\s+/).forEach(w=>{
+      const t=line?line+' '+w:w;
+      if(mctx.measureText(t).width<=maxW||!line)line=t;else{out.push(line);line=w;}
+    });
+    if(line)out.push(line);
+  });
+  return out;
+}
+function build(){
+  const g=geom();
+  const lines=wrap($('e-text').value,g.cw-24,g.fs);
+  const per=g.groups;const total=Math.max(1,Math.ceil(lines.length/per));
+  state.pages=[];
+  if(lines.length)for(let p=0;p<total;p++)state.pages.push(lines.slice(p*per,(p+1)*per));
+  $('e-countHint').textContent=lines.length?(lines.length+' model lines, '+total+(total>1?' pages':' page')+' ('+per+' per page).'+(state.dirty?' Edited text: changing the name won’t update it.':'')):'';
+  $('e-pdf').disabled=!lines.length;
+  showPage();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function makePage(i){
+  const g=geom();const W=PG().w,H=PG().h;const total=state.pages.length;
+  const el=document.createElement('div');el.className='esheet';el.style.width=W+'px';el.style.height=H+'px';
+  el.innerHTML='<div class="s-head"><div class="s-title"><div class="s-code">Handwriting Practice · '+(i+1)+' / '+total+'</div><h2 class="s-h1">'+esc($('e-title').value.trim()||'Handwriting Practice')+'</h2></div>'+
+    '<div class="s-fields"><div class="s-field"><span>Name</span><span class="s-line"></span></div><div class="s-field"><span>Date</span><span class="s-line"></span></div></div></div>';
+  const cv=document.createElement('canvas');const DPR=2;
+  cv.width=g.cw*DPR;cv.height=g.ch*DPR;cv.style.width=g.cw+'px';cv.style.height=g.ch+'px';
+  el.appendChild(cv);
+  const c=cv.getContext('2d');c.scale(DPR,DPR);c.fillStyle='#fff';c.fillRect(0,0,g.cw,g.ch);
+  const rows=state.pages[i]||[];
+  function ruled(y){
+    c.setLineDash([]);c.strokeStyle='#9AA6B8';c.lineWidth=1.5;c.beginPath();c.moveTo(0,y);c.lineTo(g.cw,y);c.stroke();
+    c.setLineDash([8,6]);c.strokeStyle='#B5BFCD';c.lineWidth=1.2;c.beginPath();c.moveTo(0,y+g.u/2);c.lineTo(g.cw,y+g.u/2);c.stroke();
+    c.setLineDash([]);c.strokeStyle='#4A5668';c.lineWidth=2;c.beginPath();c.moveTo(0,y+g.u);c.lineTo(g.cw,y+g.u);c.stroke();
+  }
+  c.font=g.fs+'px '+FONT;c.textBaseline='alphabetic';
+  let y=Math.round((g.rh-g.u)/2)-Math.round(g.u*0.2);if(y<2)y=2;
+  for(let k=0;k<g.groups;k++){
+    const text=rows[k]||'';
+    ruled(y);if(text){c.fillStyle='#1A1A1A';c.fillText(text,12,y+g.u);}
+    for(let r=0;r<state.rep;r++){
+      y+=g.rh+g.rowGap;ruled(y);
+      if(r===0&&text&&$('e-trace').checked){c.fillStyle='#C3CAD4';c.fillText(text,12,y+g.u);}
+    }
+    y+=g.rh+g.groupGap;
+  }
+  return el;
+}
+function showPage(){
+  const stage=$('e-stage');const total=state.pages.length;
+  if(!total){stage.innerHTML='<div class="empty">Pick a story or type some text.</div>';$('e-pageinfo').textContent='0 / 0';$('e-prev').disabled=$('e-next').disabled=true;return;}
+  if(stage.clientWidth<80)return;
+  state.cur=Math.max(0,Math.min(total-1,state.cur));
+  const W=PG().w,H=PG().h;const w=Math.min(W,stage.clientWidth-40);const sc=w/W;
+  stage.innerHTML='';const wrapEl=document.createElement('div');wrapEl.className='paper-wrap';
+  wrapEl.style.width=Math.round(W*sc)+'px';wrapEl.style.height=Math.round(H*sc)+'px';
+  const pg=makePage(state.cur);pg.style.transform='scale('+sc+')';wrapEl.appendChild(pg);stage.appendChild(wrapEl);
+  $('e-pageinfo').textContent=(state.cur+1)+' / '+total;
+  $('e-prev').disabled=state.cur===0;$('e-next').disabled=state.cur===total-1;
+}
+$('e-prev').addEventListener('click',()=>{state.cur--;showPage();});
+$('e-next').addEventListener('click',()=>{state.cur++;showPage();});
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(showPage,120);});
+
+function seg(attr,key,parse){
+  document.querySelectorAll('['+attr+']').forEach(b=>b.addEventListener('click',()=>{
+    state[key]=parse(b.getAttribute(attr));
+    document.querySelectorAll('['+attr+']').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+    state.cur=0;build();
+  }));
+}
+seg('data-esize','size',String);seg('data-erep','rep',Number);seg('data-epaper','paper',String);
+$('e-trace').addEventListener('change',showPage);
+let nt;$('e-name').addEventListener('input',()=>{clearTimeout(nt);nt=setTimeout(()=>{if(!state.dirty)loadStory();},250);});
+let et;$('e-text').addEventListener('input',()=>{state.dirty=true;clearTimeout(et);et=setTimeout(build,250);});
+$('e-title').addEventListener('input',()=>{clearTimeout(et);et=setTimeout(showPage,250);});
+
+function setStatus(t,err){const s=$('e-status');s.textContent=t||'';s.classList.toggle('err',!!err);}
+$('e-pdf').addEventListener('click',async()=>{
+  if(!state.pages.length)return;
+  if(!window.html2canvas||!window.jspdf){setStatus('Could not load the PDF tools. Refresh and try again.',true);return;}
+  const btn=$('e-pdf');btn.disabled=true;
+  try{
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({unit:'pt',format:PG().pdf,orientation:'portrait',compress:true});
+    const holder=$('e-render-stage');
+    for(let i=0;i<state.pages.length;i++){
+      setStatus('Making PDF… '+(i+1)+' / '+state.pages.length);
+      holder.innerHTML='';const pg=makePage(i);holder.appendChild(pg);
+      const canvas=await window.html2canvas(pg,{scale:2,backgroundColor:'#ffffff',logging:false});
+      if(i>0)pdf.addPage(PG().pdf,'portrait');
+      pdf.addImage(canvas.toDataURL('image/jpeg',0.9),'JPEG',0,0,PG().pw,PG().ph,undefined,'FAST');
+      canvas.width=canvas.height=0;
+    }
+    holder.innerHTML='';
+    const nm=($('e-name').value.trim()||'handwriting').replace(/[\\/:*?"<>|\s]+/g,'');
+    await DL.save({filename:'Handwriting_'+nm+'_'+($('e-title').value.trim()||'practice').replace(/[\\/:*?"<>|\s]+/g,'-')+'.pdf',data:pdf.output('blob')});
+    setStatus('PDF saved.');
+  }catch(e){setStatus('Could not save the PDF. Please try again.',true);}
+  finally{btn.disabled=false;}
+});
+
+renderList();
+const start=()=>{measureFont();loadStory();};
+if(document.fonts&&document.fonts.load){document.fonts.load('40px Andika').then(start,start);}else start();
 })();
 </script>
 </body>
