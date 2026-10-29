@@ -184,6 +184,8 @@ textarea.text.en{font-family:Andika,system-ui,sans-serif}
 select.text{appearance:auto}
 .tabs{overflow-x:auto;max-width:100%}
 
+#sp-render-stage{position:fixed;left:-20000px;top:0;width:820px;pointer-events:none}
+
 /* ---- site nav ---- */
 .site{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
@@ -207,6 +209,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <a href="#math" data-tab="math">수학 연산지</a>
       <a href="#hangul" data-tab="hangul">한글 글씨 연습</a>
       <a href="#english" data-tab="english">English</a>
+      <a href="#spelling" data-tab="spelling">Spelling</a>
     </div>
   </div>
 </nav>
@@ -562,11 +565,87 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 </main>
 </section>
 
+<section class="tab-sec" id="sec-spelling" aria-label="Spelling and sight words" hidden>
+<header class="top">
+  <h1>Spelling &amp; Sight Words</h1>
+  <p>Type this week’s spelling list from school, or pick a grade-level sight word set. One click makes the practice pages.</p>
+</header>
+<main class="layout">
+  <section class="panel" aria-label="Spelling settings">
+    <fieldset>
+      <legend>Words</legend>
+      <div class="seg" role="group" aria-label="Word source">
+        <button type="button" data-spsrc="list" aria-pressed="true">My spelling list</button>
+        <button type="button" data-spsrc="sight" aria-pressed="false">Sight words</button>
+      </div>
+    </fieldset>
+    <div id="sp-list-box" class="story-box" style="border-top:0;padding-top:0">
+      <input class="text" id="sp-title" type="text" maxlength="40" placeholder="Title, e.g. Week 5 Spelling Words">
+      <textarea class="text en" id="sp-words" style="min-height:150px" placeholder="One word per line (or separated by commas). Up to 20 words."></textarea>
+      <p class="hint" id="sp-count"></p>
+    </div>
+    <div id="sp-sight-box" hidden>
+      <div class="row2">
+        <div><label class="hint" for="sp-dolch">Dolch list</label><select class="text" id="sp-dolch">
+          <option value="pre">Pre-primer (PreK)</option><option value="primer">Primer (K)</option><option value="first">First grade</option><option value="second">Second grade</option><option value="third">Third grade</option></select></div>
+        <div><label class="hint" for="sp-group">Set</label><select class="text" id="sp-group"></select></div>
+      </div>
+      <div class="seg" role="group" aria-label="Words per set" style="margin-top:10px">
+        <button type="button" data-spgs="5" aria-pressed="false">5 words</button>
+        <button type="button" data-spgs="10" aria-pressed="true">10 words</button>
+      </div>
+    </div>
+    <fieldset>
+      <legend>Activities</legend>
+      <label class="switch"><input type="checkbox" data-spact="w3" checked> Write each word 3 times</label>
+      <label class="switch"><input type="checkbox" data-spact="miss" checked> Fill in the missing letters</label>
+      <label class="switch"><input type="checkbox" data-spact="scr" checked> Unscramble the word</label>
+      <label class="switch"><input type="checkbox" data-spact="abc" checked> Put the words in ABC order</label>
+      <label class="switch"><input type="checkbox" data-spact="sent" checked> Write a sentence (first 5 words)</label>
+    </fieldset>
+    <div class="row2">
+      <fieldset>
+        <legend>Letter style</legend>
+        <div class="seg" role="group" aria-label="Letter style">
+          <button type="button" data-spstyle="print" aria-pressed="true">Print</button>
+          <button type="button" data-spstyle="cursive" aria-pressed="false">Cursive</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Paper</legend>
+        <div class="seg" role="group" aria-label="Paper size">
+          <button type="button" data-sppaper="letter" aria-pressed="true">Letter</button>
+          <button type="button" data-sppaper="a4" aria-pressed="false">A4</button>
+        </div>
+      </fieldset>
+    </div>
+    <label class="switch"><input type="checkbox" id="sp-trace" checked> Light word to trace in the first box</label>
+  </section>
+
+  <section class="preview" aria-label="Spelling preview">
+    <div class="bar">
+      <div class="pager">
+        <button type="button" id="sp-prev" aria-label="Previous page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <span id="sp-pageinfo">0 / 0</span>
+        <button type="button" id="sp-next" aria-label="Next page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="secondary" id="sp-shuffle" type="button">Shuffle</button>
+        <button class="secondary" id="sp-pdf" type="button" disabled>Save PDF</button>
+      </div>
+    </div>
+    <div class="status" id="sp-status" role="status" aria-live="polite"></div>
+    <div class="stage" id="sp-stage"><div class="empty">Type some words or pick a sight word set.</div></div>
+  </section>
+</main>
+</section>
+
 <footer class="foot">무료로 쓰는 학습지예요. 이야기는 전래동화와 이솝 우화 줄거리를 바탕으로 새로 쓴 글이에요.</footer>
 <div id="render-stage" aria-hidden="true"></div>
 <div id="k-render-stage" aria-hidden="true"></div>
 <div id="e-render-stage" aria-hidden="true"></div>
 <div id="d-render-stage" aria-hidden="true"></div>
+<div id="sp-render-stage" aria-hidden="true"></div>
 
 <script src="stories.js"></script>
 <script>
@@ -590,8 +669,8 @@ function MyStore(key){
 /* tabs (hash routing) */
 (function(){
   function show(){
-    const h=location.hash.slice(1);const t=['daily','hangul','english'].includes(h)?h:'math';
-    ['daily','math','hangul','english'].forEach(k=>{document.getElementById('sec-'+k).hidden=t!==k;});
+    const h=location.hash.slice(1);const t=['daily','hangul','english','spelling'].includes(h)?h:'math';
+    ['daily','math','hangul','english','spelling'].forEach(k=>{document.getElementById('sec-'+k).hidden=t!==k;});
     document.querySelectorAll('[data-tab]').forEach(a=>a.setAttribute('aria-current',a.dataset.tab===t?'page':'false'));
     window.dispatchEvent(new Event('resize'));
   }
@@ -1602,6 +1681,212 @@ on('d-make','click',async()=>{
 
 const startDaily=()=>render();
 if(document.fonts&&document.fonts.load){document.fonts.load('40px Andika').then(startDaily,startDaily);}else startDaily();
+})();
+</script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+/* Dolch sight word lists (public domain, 1948) */
+const DOLCH={
+ pre:'a and away big blue can come down find for funny go help here I in is it jump little look make me my not one play red run said see the three to two up we where yellow you',
+ primer:'all am are at ate be black brown but came did do eat four get good have he into like must new no now on our out please pretty ran ride saw say she so soon that there they this too under want was well went what white who will with yes',
+ first:'after again an any as ask by could every fly from give going had has her him his how just know let live may of old once open over put round some stop take thank them then think walk were when',
+ second:"always around because been before best both buy call cold does don't fast first five found gave goes green its made many off or pull read right sing sit sleep tell their these those upon us use very wash which why wish work would write your",
+ third:'about better bring carry clean cut done draw drink eight fall far full got grow hold hot hurt if keep kind laugh light long much myself never only own pick seven shall show six small start ten today together try warm'
+};
+const DNAME={pre:'Dolch Pre-primer',primer:'Dolch Primer',first:'Dolch First Grade',second:'Dolch Second Grade',third:'Dolch Third Grade'};
+const PAPER={letter:{w:816,h:1056,pdf:'letter',pw:612,ph:792},a4:{w:794,h:1123,pdf:'a4',pw:595.28,ph:841.89}};
+const FONTS={print:"Andika, 'Comic Sans MS', sans-serif",cursive:"'Playwrite US Trad', 'Segoe Script', cursive"};
+const KEY='kmom.spell.v1';
+const st={src:'list',dolch:'first',group:0,gs:10,style:'print',paper:'letter',trace:true,acts:{w3:true,miss:true,scr:true,abc:true,sent:true},title:'',words:'',seed:7,xr:0.5,pages:[],cur:0};
+try{Object.assign(st,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch(e){}
+st.pages=[];st.cur=0;
+function save(){try{const {pages,cur,xr,...rest}=st;localStorage.setItem(KEY,JSON.stringify(rest));}catch(e){}}
+const PG=()=>PAPER[st.paper];
+const FONT=()=>FONTS[st.style];
+const mctx=document.createElement('canvas').getContext('2d');
+function measure(){mctx.font='100px '+FONT();const r=(mctx.measureText('x').actualBoundingBoxAscent||50)/100;st.xr=(r>0.2&&r<0.7)?r:0.5;}
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffle(arr,r){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function words(){
+  if(st.src==='sight'){const all=DOLCH[st.dolch].split(' ');return all.slice(st.group*st.gs,(st.group+1)*st.gs);}
+  return st.words.split(/[\n,]+/).map(w=>w.trim()).filter(Boolean).slice(0,20);
+}
+function title(){
+  if(st.src==='sight'){const n=DOLCH[st.dolch].split(' ').length;const a=st.group*st.gs+1,b=Math.min(n,(st.group+1)*st.gs);return DNAME[st.dolch]+' · Words '+a+'–'+b;}
+  return st.title.trim()||'Spelling Words';
+}
+
+/* ---------- drawing helpers ---------- */
+function ruled(c,x,y,w,u){
+  c.setLineDash([]);c.strokeStyle='#9AA6B8';c.lineWidth=1.3;c.beginPath();c.moveTo(x,y);c.lineTo(x+w,y);c.stroke();
+  c.setLineDash([6,5]);c.strokeStyle='#B5BFCD';c.lineWidth=1.1;c.beginPath();c.moveTo(x,y+u/2);c.lineTo(x+w,y+u/2);c.stroke();
+  c.setLineDash([]);c.strokeStyle='#4A5668';c.lineWidth=1.8;c.beginPath();c.moveTo(x,y+u);c.lineTo(x+w,y+u);c.stroke();
+}
+function geo(){
+  const W=PG().w,H=PG().h;const u=34;
+  return {cw:W-104,ch:H-88-92,u,row:u+24,fs:Math.round(u*0.5/st.xr)};
+}
+function heading(t,sub){return {h:56,draw(c,y,g){c.fillStyle='#1F4E9A';c.font='700 20px Andika, sans-serif';c.fillText(t,0,y+22);if(sub){c.fillStyle='#5A6472';c.font="13px 'Noto Sans KR', sans-serif";c.fillText(sub,0,y+42);}}};}
+function num(c,n,x,base){c.fillStyle='#1F4E9A';c.font="700 14px 'Noto Sans KR', sans-serif";c.fillText(n+'.',x,base);}
+
+function blkWrite3(w){return {h:0,draw(c,y,g){
+  const u=g.u, base=y+u+4, colW=170, gap=14, seg=(g.cw-colW-gap*3)/3;
+  ruled(c,0,y+4,colW-10,u);c.fillStyle='#1A1A1A';c.font=g.fs+'px '+FONT();c.fillText(w,6,base);
+  for(let k=0;k<3;k++){const x=colW+gap+k*(seg+gap);ruled(c,x,y+4,seg,u);
+    if(k===0&&st.trace){c.fillStyle='#C3CAD4';c.fillText(w,x+6,base);}}
+}};}
+function missPattern(w,r){
+  const ch=Array.from(w);const idx=ch.map((x,i)=>/[a-z]/i.test(x)?i:-1).filter(i=>i>=0);
+  if(!idx.length)return ch.map(x=>x);
+  const vow=idx.filter(i=>/[aeiou]/i.test(ch[i]));
+  const pool=vow.length?vow:idx;
+  const k=Math.max(1,Math.min(pool.length,Math.floor(idx.length/3)||1));
+  const pick=new Set(shuffle(pool,r).slice(0,k));
+  return ch.map((x,i)=>pick.has(i)?null:x);
+}
+function blkPair(items,drawOne){return {h:0,draw(c,y,g){const half=(g.cw-24)/2;items.forEach((it,k)=>drawOne(c,k*(half+24),y,half,g,it));}};}
+function drawMiss(c,x,y,w,g,it){
+  const u=g.u,base=y+u+4;num(c,it.n,x,base);
+  c.font=g.fs+'px '+FONT();c.fillStyle='#1A1A1A';
+  let px=x+30;const bw=g.fs*0.55;
+  it.pat.forEach(ch=>{if(ch===null){c.strokeStyle='#1A1A1A';c.lineWidth=1.6;c.beginPath();c.moveTo(px,base+2);c.lineTo(px+bw,base+2);c.stroke();px+=bw+g.fs*0.18;}
+    else{c.fillText(ch,px,base);px+=c.measureText(ch).width+g.fs*0.18;}});
+  const lx=Math.max(px+14,x+w*0.48);ruled(c,lx,y+4,x+w-lx,u);
+}
+function drawScr(c,x,y,w,g,it){
+  const u=g.u,base=y+u+4;num(c,it.n,x,base);
+  c.font=g.fs+'px '+FONT();c.fillStyle='#1A1A1A';c.fillText(it.s,x+30,base);
+  const tw=c.measureText(it.s).width;c.fillStyle='#8A94A3';c.font="18px 'Noto Sans KR', sans-serif";c.fillText('→',x+38+tw,base-4);
+  const lx=Math.max(x+64+tw,x+w*0.5);ruled(c,lx,y+4,x+w-lx,u);
+}
+function drawAbc(c,x,y,w,g,it){const u=g.u;num(c,it.n,x,y+u+4);ruled(c,x+30,y+4,w-30,u);}
+function blkBank(ws){
+  return {h:0,measure(g){mctx.font=Math.round(g.fs*0.8)+'px '+FONT();const lines=[];let line='';ws.forEach(w=>{const t=line?line+'      '+w:w;if(mctx.measureText(t).width>g.cw-40&&line){lines.push(line);line=w;}else line=t;});if(line)lines.push(line);this.lines=lines;return 24+lines.length*Math.round(g.fs*1.3);},
+  draw(c,y,g){const h=this.h-10;c.strokeStyle='#B8C4D6';c.lineWidth=1.5;c.setLineDash([]);
+    c.beginPath();if(c.roundRect)c.roundRect(0,y,g.cw,h,10);else c.rect(0,y,g.cw,h);c.stroke();
+    c.fillStyle='#1A1A1A';c.font=Math.round(g.fs*0.8)+'px '+FONT();this.lines.forEach((l,i)=>c.fillText(l,20,y+18+(i+0.8)*Math.round(g.fs*1.3)-6));}};
+}
+function blkSentence(n,w){return {h:0,draw(c,y,g){
+  c.fillStyle='#1F4E9A';c.font="700 14px 'Noto Sans KR', sans-serif";c.fillText(n+'.',0,y+16);
+  c.fillStyle='#333';c.font="14px 'Noto Sans KR', sans-serif";c.fillText('Use',22,y+16);
+  c.font=Math.round(g.fs*0.7)+'px '+FONT();c.fillStyle='#1A1A1A';const wx=52;c.fillText(w,wx,y+17);
+  const ww=c.measureText(w).width;c.fillStyle='#333';c.font="14px 'Noto Sans KR', sans-serif";c.fillText('in a sentence.',wx+ww+8,y+16);
+  ruled(c,0,y+28,g.cw,g.u);ruled(c,0,y+28+g.u+18,g.cw,g.u);
+}};}
+
+/* ---------- build pages ---------- */
+function build(){
+  measure();
+  const ws=words();
+  $('sp-count').textContent=st.src==='list'?(ws.length?ws.length+' word'+(ws.length>1?'s':'')+(st.words.split(/[\n,]+/).filter(x=>x.trim()).length>20?' (only the first 20 are used)':''):''):'';
+  if(!ws.length){st.pages=[];$('sp-pdf').disabled=true;showPage();return;}
+  const g=geo();const r=rng(st.seed);
+  const sections=[];
+  if(st.acts.w3)sections.push({t:'Write each word 3 times',sub:'Read the word, then write it in each box.',rows:ws.map(w=>Object.assign(blkWrite3(w),{h:g.row}))});
+  const pairs=(list,fn)=>{const out=[];for(let i=0;i<list.length;i+=2){out.push(Object.assign(blkPair(list.slice(i,i+2),fn),{h:g.row}));}return out;};
+  if(st.acts.miss)sections.push({t:'Fill in the missing letters',sub:'Write the whole word on the line.',rows:pairs(shuffle(ws,r).map((w,i)=>({n:i+1,pat:missPattern(w,r)})),drawMiss)});
+  if(st.acts.scr){const items=shuffle(ws,r).map((w,i)=>{let s=w;const L=Array.from(w);if(new Set(L.map(x=>x.toLowerCase())).size>1){for(let t=0;t<12&&s===w;t++)s=shuffle(L,r).join('').toLowerCase();}return {n:i+1,s:s.toLowerCase()};});
+    sections.push({t:'Unscramble the word',sub:'Mix up the letters back into a word from the list.',rows:pairs(items,drawScr)});}
+  if(st.acts.abc){const bank=blkBank(shuffle(ws,r));bank.h=bank.measure(g)+14;
+    sections.push({t:'ABC order',sub:'Write the words in alphabetical order.',rows:[bank].concat(pairs(ws.map((w,i)=>({n:i+1})),drawAbc))});}
+  if(st.acts.sent)sections.push({t:'Write a sentence',sub:'Use each word in your own sentence.',rows:ws.slice(0,5).map((w,i)=>Object.assign(blkSentence(i+1,w),{h:28+g.u*2+18+22}))});
+  // pack into pages
+  const pages=[];let page=[],y=0;
+  const push=b=>{page.push({b,y});y+=b.h;};
+  const newPage=()=>{if(page.length)pages.push(page);page=[];y=0;};
+  sections.forEach(sec=>{
+    const head=heading(sec.t,sec.sub);
+    if(y>0&&y+head.h+sec.rows[0].h+10>g.ch)newPage();
+    if(y>0)y+=14;
+    push(head);
+    sec.rows.forEach(row=>{if(y+row.h>g.ch){newPage();push(heading(sec.t+' (continued)',''));}push(row);});
+  });
+  newPage();
+  st.pages=pages;if(st.cur>=pages.length)st.cur=0;
+  $('sp-pdf').disabled=false;save();showPage();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function makePage(i){
+  const g=geo();const W=PG().w,H=PG().h;const total=st.pages.length;
+  const el=document.createElement('div');el.className='esheet';el.style.width=W+'px';el.style.height=H+'px';
+  el.innerHTML='<div class="s-head"><div class="s-title"><div class="s-code">'+(st.src==='sight'?'Sight Words':'Spelling Practice')+' · '+(i+1)+' / '+total+'</div><h2 class="s-h1">'+esc(title())+'</h2></div>'+
+    '<div class="s-fields"><div class="s-field"><span>Name</span><span class="s-line"></span></div><div class="s-field"><span>Date</span><span class="s-line"></span></div></div></div>';
+  const cv=document.createElement('canvas');const DPR=2;cv.width=g.cw*DPR;cv.height=g.ch*DPR;cv.style.width=g.cw+'px';cv.style.height=g.ch+'px';el.appendChild(cv);
+  const c=cv.getContext('2d');c.scale(DPR,DPR);c.fillStyle='#fff';c.fillRect(0,0,g.cw,g.ch);c.textBaseline='alphabetic';
+  (st.pages[i]||[]).forEach(({b,y})=>{c.save();b.draw(c,y,g);c.restore();});
+  return el;
+}
+function showPage(){
+  const stage=$('sp-stage');const total=st.pages.length;
+  if(!total){stage.innerHTML='<div class="empty">Type some words or pick a sight word set.</div>';$('sp-pageinfo').textContent='0 / 0';$('sp-prev').disabled=$('sp-next').disabled=true;return;}
+  if(stage.clientWidth<80)return;
+  st.cur=Math.max(0,Math.min(total-1,st.cur));
+  const W=PG().w,H=PG().h;const w=Math.min(W,stage.clientWidth-40);const sc=w/W;
+  stage.innerHTML='';const wrap=document.createElement('div');wrap.className='paper-wrap';wrap.style.width=Math.round(W*sc)+'px';wrap.style.height=Math.round(H*sc)+'px';
+  const pg=makePage(st.cur);pg.style.transform='scale('+sc+')';wrap.appendChild(pg);stage.appendChild(wrap);
+  $('sp-pageinfo').textContent=(st.cur+1)+' / '+total;$('sp-prev').disabled=st.cur===0;$('sp-next').disabled=st.cur===total-1;
+}
+
+/* ---------- controls ---------- */
+function fillGroups(){
+  const n=DOLCH[st.dolch].split(' ').length;const k=Math.ceil(n/st.gs);if(st.group>=k)st.group=0;
+  $('sp-group').innerHTML=Array.from({length:k},(_,i)=>'<option value="'+i+'">Words '+(i*st.gs+1)+'–'+Math.min(n,(i+1)*st.gs)+'</option>').join('');
+  $('sp-group').value=st.group;
+}
+function seg(attr,key,parse,after){
+  const btns=document.querySelectorAll('['+attr+']');
+  const paint=()=>btns.forEach(b=>b.setAttribute('aria-pressed',String(parse(b.getAttribute(attr)))===String(st[key])?'true':'false'));
+  btns.forEach(b=>b.addEventListener('click',()=>{st[key]=parse(b.getAttribute(attr));paint();if(after)after();rebuild();}));
+  paint();
+}
+function srcUI(){const s=st.src==='sight';$('sp-list-box').hidden=s;$('sp-sight-box').hidden=!s;}
+let fontReady=false;
+function rebuild(){
+  const fam=st.style==='cursive'?'40px "Playwrite US Trad"':'40px Andika';
+  if(document.fonts&&document.fonts.load)document.fonts.load(fam).then(build,build);else build();
+}
+seg('data-spsrc','src',String,()=>{srcUI();if(st.src==='sight')$('sp-trace').checked=st.trace=true;$('sp-trace').checked=st.trace;});
+seg('data-spgs','gs',Number,()=>{st.group=0;fillGroups();});
+seg('data-spstyle','style',String);
+seg('data-sppaper','paper',String);
+document.querySelectorAll('[data-spact]').forEach(b=>{b.checked=!!st.acts[b.dataset.spact];b.addEventListener('change',()=>{st.acts[b.dataset.spact]=b.checked;rebuild();});});
+$('sp-dolch').value=st.dolch;fillGroups();srcUI();
+$('sp-title').value=st.title;$('sp-words').value=st.words;$('sp-trace').checked=st.trace;
+$('sp-dolch').addEventListener('change',()=>{st.dolch=$('sp-dolch').value;st.group=0;fillGroups();rebuild();});
+$('sp-group').addEventListener('change',()=>{st.group=+$('sp-group').value;rebuild();});
+let t;['sp-title','sp-words'].forEach(id=>$(id).addEventListener('input',()=>{st.title=$('sp-title').value;st.words=$('sp-words').value;clearTimeout(t);t=setTimeout(build,300);}));
+$('sp-trace').addEventListener('change',()=>{st.trace=$('sp-trace').checked;build();});
+$('sp-shuffle').addEventListener('click',()=>{st.seed=(st.seed*7919+13)%100000;build();});
+$('sp-prev').addEventListener('click',()=>{st.cur--;showPage();});
+$('sp-next').addEventListener('click',()=>{st.cur++;showPage();});
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(showPage,120);});
+
+function setStatus(x,err){const s=$('sp-status');s.textContent=x||'';s.classList.toggle('err',!!err);}
+$('sp-pdf').addEventListener('click',async()=>{
+  if(!st.pages.length)return;
+  if(!window.html2canvas||!window.jspdf){setStatus('Could not load the PDF tools. Refresh and try again.',true);return;}
+  const btn=$('sp-pdf');btn.disabled=true;
+  try{
+    const {jsPDF}=window.jspdf;const P=PG();const pdf=new jsPDF({unit:'pt',format:P.pdf,orientation:'portrait',compress:true});
+    const holder=$('sp-render-stage');
+    for(let i=0;i<st.pages.length;i++){
+      setStatus('Making PDF… '+(i+1)+' / '+st.pages.length);
+      holder.innerHTML='';const pg=makePage(i);holder.appendChild(pg);
+      const canvas=await window.html2canvas(pg,{scale:2,backgroundColor:'#ffffff',logging:false});
+      if(i>0)pdf.addPage(P.pdf,'portrait');
+      pdf.addImage(canvas.toDataURL('image/jpeg',0.9),'JPEG',0,0,P.pw,P.ph,undefined,'FAST');canvas.width=canvas.height=0;
+    }
+    holder.innerHTML='';
+    await DL.save({filename:(st.src==='sight'?'SightWords_':'Spelling_')+title().replace(/[\\/:*?"<>|\s·–]+/g,'-')+'.pdf',data:pdf.output('blob')});
+    setStatus('PDF saved.');
+  }catch(e){setStatus('Could not save the PDF. Please try again.',true);}
+  finally{btn.disabled=false;}
+});
+
+if(document.fonts&&document.fonts.load){document.fonts.load('40px Andika').then(rebuild,rebuild);}else rebuild();
 })();
 </script>
 </body>
