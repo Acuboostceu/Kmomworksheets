@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>우리 아이 학습지 — 연산지 · 한글 · English</title>
+<title>Kmom 학습지 · Kmom Worksheets — 연산지 · 한글 칸 노트 · 영어 필기체</title>
 <meta name="description" content="무료 초등 학습지: 수학 연산지, 아이 이름이 들어간 한글 칸 노트, 영어 필기체 연습. 가입 없이 Letter·A4 PDF로 저장해 인쇄하세요.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://kmom-worksheets.vercel.app/">
-<meta property="og:title" content="우리 아이 학습지 — 연산지 · 한글 칸 노트 · 영어 필기체">
+<meta property="og:title" content="Kmom 학습지 · Kmom Worksheets — 연산지 · 한글 칸 노트 · 영어 필기체">
+<meta property="og:site_name" content="Kmom Worksheets">
 <meta property="og:description" content="무료, 가입 없음. 원하는 레벨과 분량으로 PDF를 만들어 인쇄하세요.">
 <meta property="og:image" content="https://kmom-worksheets.vercel.app/og.png">
 <meta property="og:image:width" content="1200">
@@ -177,7 +178,9 @@ textarea.text.en{font-family:Andika,system-ui,sans-serif}
 .site{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
 .site-in{max-width:1240px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.brand{font-weight:900;font-size:18px;margin-right:auto}
+.brand{font-weight:900;font-size:18px;margin-right:auto;display:flex;align-items:baseline;gap:8px}
+.brand small{font-size:13px;font-weight:500;color:var(--muted)}
+@media (max-width:520px){.brand small{display:none}}
 .tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}
 .tabs a{display:flex;align-items:center;min-height:40px;padding:0 14px;white-space:nowrap;border-radius:9px;text-decoration:none;color:var(--muted);font-weight:700}
 .tabs a[aria-current="page"]{background:var(--surface);color:var(--accent);box-shadow:0 0 0 1px var(--line)}
@@ -188,7 +191,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 <body>
 <nav class="site" aria-label="학습지 종류">
   <div class="site-in">
-    <span class="brand">우리 아이 학습지</span>
+    <span class="brand">Kmom 학습지<small>Kmom Worksheets</small></span>
     <div class="tabs">
       <a href="#math" data-tab="math">수학 연산지</a>
       <a href="#hangul" data-tab="hangul">한글 글씨 연습</a>
