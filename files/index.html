@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✏️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Playwrite+US+Trad:wght@400&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -349,6 +349,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <fieldset>
       <legend>Story</legend>
       <div class="levels" id="e-list"></div>
+    </fieldset>
+    <fieldset>
+      <legend>Letter style</legend>
+      <div class="seg" role="group" aria-label="Letter style">
+        <button type="button" data-estyle="print" aria-pressed="true">Print</button>
+        <button type="button" data-estyle="cursive" aria-pressed="false">Cursive</button>
+      </div>
     </fieldset>
     <fieldset>
       <legend>Line size</legend>
@@ -991,8 +998,9 @@ const EN_STORIES=[
 const $=id=>document.getElementById(id);
 const PAPER={letter:{w:816,h:1056,pdf:'letter',pw:612,ph:792},a4:{w:794,h:1123,pdf:'a4',pw:595.28,ph:841.89}};
 const SIZE={L:48,M:38,S:28};
-const FONT="Andika, 'Comic Sans MS', 'Trebuchet MS', sans-serif";
-const state={storyId:EN_STORIES[0].id,size:'L',rep:1,paper:'letter',dirty:false,pages:[],cur:0,xRatio:0.5};
+const FONTS={print:"Andika, 'Comic Sans MS', 'Trebuchet MS', sans-serif",cursive:"'Playwrite US Trad', 'Segoe Script', cursive"};
+let FONT=FONTS.print;
+const state={style:'print',storyId:EN_STORIES[0].id,size:'L',rep:1,paper:'letter',dirty:false,pages:[],cur:0,xRatio:0.5};
 const PG=()=>PAPER[state.paper];
 const mctx=document.createElement('canvas').getContext('2d');
 
@@ -1026,7 +1034,7 @@ function measureFont(){
   mctx.font='100px '+FONT;
   const m=mctx.measureText('x');
   const r=(m.actualBoundingBoxAscent||50)/100;
-  state.xRatio=(r>0.3&&r<0.7)?r:0.5;
+  state.xRatio=(r>0.2&&r<0.7)?r:0.5;
 }
 function wrap(text,maxW,fs){
   mctx.font=fs+'px '+FONT;
@@ -1103,7 +1111,14 @@ function seg(attr,key,parse){
     state.cur=0;build();
   }));
 }
-seg('data-esize','size',String);seg('data-erep','rep',Number);seg('data-epaper','paper',String);
+seg('data-esize','size',String);
+document.querySelectorAll('[data-estyle]').forEach(b=>b.addEventListener('click',()=>{
+  state.style=b.dataset.estyle;FONT=FONTS[state.style];
+  document.querySelectorAll('[data-estyle]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+  const go=()=>{measureFont();state.cur=0;build();};
+  const fam=state.style==='cursive'?'40px "Playwrite US Trad"':'40px Andika';
+  if(document.fonts&&document.fonts.load)document.fonts.load(fam).then(go,go);else go();
+}));seg('data-erep','rep',Number);seg('data-epaper','paper',String);
 $('e-trace').addEventListener('change',showPage);
 let nt;$('e-name').addEventListener('input',()=>{clearTimeout(nt);nt=setTimeout(()=>{if(!state.dirty)loadStory();},250);});
 let et;$('e-text').addEventListener('input',()=>{state.dirty=true;clearTimeout(et);et=setTimeout(build,250);});
